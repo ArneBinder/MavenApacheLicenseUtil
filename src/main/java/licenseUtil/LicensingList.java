@@ -7,6 +7,8 @@ import org.apache.commons.csv.CSVRecord;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
@@ -15,6 +17,8 @@ import java.util.*;
  * Created by Arne Binder (arne.b.binder@gmail.com) on 10.09.2015.
  */
 public class LicensingList extends ArrayList<LicensingObject> {
+
+    final Logger logger = LoggerFactory.getLogger(LicenseUtil.class);
 
     static final char columnDelimiter = '\t';
     static final String excludedScope = "test";
@@ -67,11 +71,10 @@ public class LicensingList extends ArrayList<LicensingObject> {
                 }
                 csvFilePrinter.printRecord(licensingObject.getRecord(headers));
             }
-
-            System.out.println("CSV file was created successfully !!!");
+            logger.info("CSV file was created successfully");
 
         } catch (Exception e) {
-            System.out.println("Error in CsvFileWriter !!!");
+            logger.error("Error in CsvFileWriter");
             e.printStackTrace();
         } finally {
             try {
@@ -79,7 +82,7 @@ public class LicensingList extends ArrayList<LicensingObject> {
                 fileWriter.close();
                 csvFilePrinter.close();
             } catch (IOException e) {
-                System.out.println("Error while flushing/closing fileWriter/csvPrinter !!!");
+                logger.error("Error while flushing/closing fileWriter/csvPrinter !!!");
                 e.printStackTrace();
             }
         }
@@ -92,10 +95,8 @@ public class LicensingList extends ArrayList<LicensingObject> {
 
             licensingObject.clean();
 
-            //HashSet<String> libStrings = new HashSet<>();
             if(licensingObject.containsKey(moduleName)){
                 HashSet<String> licenseElement;
-                //String licenseKey = licensingObject.get(ColumnHeader.LICENSE_SHORT.value())+columnDelimiter+licensingObject.get(ColumnHeader.LICENSE.value());
                 String licenseKey = licensingObject.get(Utils.ColumnHeader.LICENSE.value());
                 if(!licenseList.containsKey(licenseKey)){
                     licenseElement = new HashSet<String>();
@@ -148,7 +149,6 @@ public class LicensingList extends ArrayList<LicensingObject> {
                 result += "\n-----------------------------------------------------------------------------\n\n";
                 while ((line = bufferedReader.readLine()) != null) {
                     if(line.toLowerCase().contains(libraryListPlaceholder)){
-                        //result += licenseList.get(key);
                         result += "applies to:\n";
                         ArrayList<String> sortedLibraryInfos = new ArrayList<String>(licenseList.get(key));
                         Collections.sort(sortedLibraryInfos);
@@ -208,21 +208,17 @@ public class LicensingList extends ArrayList<LicensingObject> {
 
     @Override
     public boolean add(LicensingObject newLicensingObject) {
-        //System.out.println("add\t" + newLicensingObject.toString());
-        //System.out.println("to \t"+toString());
-        int index = indexOf(newLicensingObject);
-        //System.out.println("index: "+index);
+         int index = indexOf(newLicensingObject);
         if (index == -1) {
             return super.add(newLicensingObject);
         } else {
             LicensingObject inList = get(index);
             remove(index);
-            //System.out.println("after removing:\t" + toString());
             if (indexOf(newLicensingObject) != -1) {
                 // or throw exception?
-                System.out.println("could not add newLicensingObject:\t" + newLicensingObject.toString());
+                logger.warn("could not add newLicensingObject:\t" + newLicensingObject.toString());
                 super.add(inList);
-                System.out.println("current List:\t" + toString());
+                logger.debug("current List:\t" + toString());
                 return false;
             } else {
                 inList.update(newLicensingObject);

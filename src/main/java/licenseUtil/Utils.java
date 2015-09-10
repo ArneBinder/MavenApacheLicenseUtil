@@ -8,14 +8,11 @@ import org.apache.maven.project.MavenProject;
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * Created by Arne Binder (arne.b.binder@gmail.com) on 10.09.2015.
  */
 public class Utils {
-
-    //final Logger logger = LoggerFactory.getLogger(Utils.class);
 
     public enum ColumnHeader {
         ARTIFACT_ID("artefactId"),
