@@ -18,7 +18,7 @@ import java.util.*;
  */
 public class LicensingList extends ArrayList<LicensingObject> {
 
-    final Logger logger = LoggerFactory.getLogger(LicenseUtil.class);
+    final Logger logger = LoggerFactory.getLogger(LicensingList.class);
 
     static final char columnDelimiter = '\t';
     static final String excludedScope = "test";
@@ -27,6 +27,7 @@ public class LicensingList extends ArrayList<LicensingObject> {
     static final Boolean aggregateByLibrary = false;
 
     public void readFromSpreadsheet(String spreadsheetFN) throws IOException {
+        logger.info("read spreadsheet from \"" + spreadsheetFN + "\"...");
         InputStreamReader inputStreamReader = null;
         try {
             inputStreamReader = new InputStreamReader(new FileInputStream(spreadsheetFN), "UTF-8");
@@ -45,6 +46,7 @@ public class LicensingList extends ArrayList<LicensingObject> {
     }
 
     public void writeToSpreadsheet(String spreadsheetFN) throws IOException {
+        logger.info("write spreadsheet to \"" + spreadsheetFN + "\"...");
         FileWriter fileWriter = null;
         CSVPrinter csvFilePrinter = null;
 
@@ -178,6 +180,7 @@ public class LicensingList extends ArrayList<LicensingObject> {
 
 
     public void addMavenProject(MavenProject project) {
+        logger.debug("add pom content to current list...");
         List<Dependency> dependencies = project.getDependencies();
 
         for (Dependency dependency : dependencies) {

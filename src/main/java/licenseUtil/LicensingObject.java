@@ -13,7 +13,7 @@ import java.util.*;
  */
 public class LicensingObject extends HashMap<String, String> {
 
-    final Logger logger = LoggerFactory.getLogger(LicenseUtil.class);
+    final Logger logger = LoggerFactory.getLogger(LicensingObject.class);
     static final HashSet<String> keyHeaders = new HashSet<String>(Arrays.asList(Utils.ColumnHeader.ARTIFACT_ID.value(), Utils.ColumnHeader.GROUP_ID.value(), Utils.ColumnHeader.VERSION.value()));
 
     LicensingObject(Dependency dependency, String includingProject) {
