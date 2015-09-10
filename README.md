@@ -1,21 +1,27 @@
-#Maven License Util
+#Maven Apache License Util
+
+If you want to publish your project under the [Apache2 license](http://www.apache.org/licenses/LICENSE-2.0) and it 
+includes third-party libraries you have to fulfill their re-publishing requirements. This tool follows [this recommendation] 
+and helps you to create LICENSE-3RD-PARTY files. 
+
+[These PAQs](http://www.apache.org/legal/resolved.html) give an overview about licenses which are compatible with the Apache2 license.
 
 ##The workflow is as follows:
 
 1. Generate an effective-pom file for the project you want to add a LICENSE-3RD-PARTY file:
-	- `maven-license-util --buildEffectivePom \<MavenProjectDirectory\>`
+	- `maven-apache-license-util --buildEffectivePom \<MavenProjectDirectory\>`
 2. Add it to the tsv-file (which doesnt exists in the first run):
-	- `maven-license-util --addPomToTsv effective-pom.xml licenses.stub.tsv`
+	- `maven-apache-license-util --addPomToTsv effective-pom.xml licenses.stub.tsv`
 3. Repeat step 1 and 2 until all projects you want to have LICENSE-3RD-PARTY files for are added
 4. Enhance the licenses.stub.tsv by yourself:
 	- Especially fill the "license" column according to the filenames of the license templates in resources/templates (APACHE2, BSD, CDDL, EPLV1, GPLV2. GPLV3, H2, JSON, LGPLV3, MIT).
 	- Furthermore, fill the column libraryName for better readability and copyRightInformation, if this information is available.
 5. Create the LICENSE-3RD-PARTY files by
-	- `--writeLicense3rdParty licenses.enhanced.tsv ALL`
+	- `maven-apache-license-util --writeLicense3rdParty licenses.enhanced.tsv ALL`
 
 ##Usage
 
-maven-license-util \<option\> [parameters...]
+maven-apache-license-util \<option\> [parameters...]
 
 ##Options:
 ```
