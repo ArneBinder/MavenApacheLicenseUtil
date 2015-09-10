@@ -86,7 +86,7 @@ public class LicenseUtil {
                     + "\t4. Enhance the licenses.stub.tsv by yourself:\n" +
                             "\t\t\tEspecially fill the \"license\" column according to the filenames of the license templates \n" +
                             "\t\t\tin resources/templates (APACHE2, BSD, CDDL, EPLV1, GPLV2. GPLV3, H2, JSON, LGPLV3, MIT).\n" +
-                            "\t\t\tFurthermore, fill the column libraryName for better readability and copyRightInformation,\n" +
+                            "\t\t\tFurthermore, fill the column \"bundle\" for better readability and \"copyRightInformation\",\n" +
                             "\t\t\tif this information is available.\n"
                     + "\t5. Create the LICENSE-3RD-PARTY files by\n" +
                             "\t\t\t--writeLicense3rdParty licenses.enhanced.tsv ALL"

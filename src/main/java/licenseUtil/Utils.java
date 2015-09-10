@@ -36,7 +36,7 @@ public class Utils {
         ARTIFACT_ID("artefactId"),
         GROUP_ID("groupId"),
         VERSION("version"),
-        LIBRARY_NAME("libraryName"),
+        LIBRARY_NAME("bundle"),
         LICENSE("license"),
         COPYRIGHT_INFORMATION("copyRightInformation");
 

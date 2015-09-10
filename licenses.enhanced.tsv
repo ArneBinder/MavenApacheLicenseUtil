@@ -1,0 +1,16 @@
+artefactId	groupId	version	libraryName	license	copyRightInformation	maven-apache-license-util
+aether-connector-wagon	org.eclipse.aether	'0.9.0.M2'	Aether	EPLV1		x
+commons-csv	org.apache.commons	'1.1'	Apache Commons IO	APACHE2	2011–2015 The Apache Software Foundation	x
+license-maven-plugin	com.mycila	'2.3'	License Plugin	APACHE2	2008 Mycila (mathieu.carbou@gmail.com)	x
+logback-classic	ch.qos.logback	'1.0.13'	Apache Maven Plugins	APACHE2	2002–2015 The Apache Software Foundation. All rights reserved.	x
+maven-clean-plugin	org.apache.maven.plugins	'2.5'	Apache Maven Plugins	APACHE2	2002–2015 The Apache Software Foundation. All rights reserved.	x
+maven-compiler-plugin	org.apache.maven.plugins	'3.3'	Apache Maven Plugins	APACHE2	2002–2015 The Apache Software Foundation. All rights reserved.	x
+maven-deploy-plugin	org.apache.maven.plugins	'2.7'	Apache Maven Plugins	APACHE2	2002–2015 The Apache Software Foundation. All rights reserved.	x
+maven-embedder	org.apache.maven	'3.1.1'	Apache Maven Plugins	APACHE2	2002–2015 The Apache Software Foundation. All rights reserved.	x
+maven-install-plugin	org.apache.maven.plugins	'2.4'	Apache Maven Plugins	APACHE2	2002–2015 The Apache Software Foundation. All rights reserved.	x
+maven-jar-plugin	org.apache.maven.plugins	'2.4'	Apache Maven Plugins	APACHE2	2002–2015 The Apache Software Foundation. All rights reserved.	x
+maven-model	org.apache.maven	'3.3.3'	Apache Maven Plugins	APACHE2	2002–2015 The Apache Software Foundation. All rights reserved.	x
+maven-resources-plugin	org.apache.maven.plugins	'2.6'	Apache Maven Plugins	APACHE2	2002–2015 The Apache Software Foundation. All rights reserved.	x
+maven-site-plugin	org.apache.maven.plugins	'3.3'	Apache Maven Plugins	APACHE2	2002–2015 The Apache Software Foundation. All rights reserved.	x
+maven-surefire-plugin	org.apache.maven.plugins	'2.12.4'	Apache Maven Plugins	APACHE2	2002–2015 The Apache Software Foundation. All rights reserved.	x
+wagon-http-lightweight	org.apache.maven.wagon	'2.5'	Lightweight HTTP	APACHE2	The Apache Software Foundation. All Rights Reserved.	x
