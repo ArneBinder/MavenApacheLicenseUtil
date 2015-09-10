@@ -1,5 +1,5 @@
 /**
- * Copyright (C) ${project.inceptionYear} Arne Binder (arne.b.binder@gmail.com)
+ * Copyright (C) 2015 Arne Binder (arne.b.binder@gmail.com)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -115,16 +115,10 @@ public class LicensingObject extends HashMap<String, String> {
             return origElemt;
     }
 
-
     public void clean() {
         for (String key : keySet()) {
             if (get(key) == null || get(key).equals(""))
                 remove(key);
         }
     }
-
-        /*@Override
-        public String toString() {
-            return get("groupId")+":"+get("artefactId")+":"+get("version")+"#"+get("libraryName")+"#"+licenseName+"#"+copyRightInformation+"#"+includingProjects.toString();
-        }*/
 }
