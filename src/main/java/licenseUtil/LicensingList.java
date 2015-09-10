@@ -39,7 +39,7 @@ public class LicensingList extends ArrayList<LicensingObject> {
     static final String excludedScope = "test";
     static final CharSequence libraryListPlaceholder = "#librarylist";
     static final String licenseTextDirectory = "src/main/resources/templates/";
-    static final Boolean aggregateByLibrary = false;
+    static final Boolean aggregateByBundle = false;
 
     public void readFromSpreadsheet(String spreadsheetFN) throws IOException {
         logger.info("read spreadsheet from \"" + spreadsheetFN + "\"...");
@@ -120,14 +120,14 @@ public class LicensingList extends ArrayList<LicensingObject> {
                 }else {
                     licenseElement = licenseList.get(licenseKey);
                 }
-                String libString = licensingObject.get(Utils.ColumnHeader.LIBRARY_NAME.value());
+                String libString = licensingObject.get(Utils.ColumnHeader.BUNDLE.value());
                 if(libString==null){
                     libString = "";
                 }else{
                     libString += " - ";
                 }
 
-                if(libString.trim().equals("") || !aggregateByLibrary){
+                if(libString.trim().equals("") || !aggregateByBundle){
                     libString += licensingObject.get(Utils.ColumnHeader.ARTIFACT_ID.value());
                     String version = licensingObject.get(Utils.ColumnHeader.VERSION.value());
                     if(version!=null){
@@ -201,18 +201,14 @@ public class LicensingList extends ArrayList<LicensingObject> {
         for (Dependency dependency : dependencies) {
             if(dependency.getScope()==null || !dependency.getScope().equals(excludedScope)) {
                 LicensingObject licensingObject = new LicensingObject(dependency, project.getArtifactId());
-                if (!add(licensingObject)) {
-                    //TODO
-                }
+                add(licensingObject);
             }
         }
 
         List<Plugin> plugins = project.getBuild().getPlugins();
         for (Plugin plugin : plugins) {
             LicensingObject licensingObject = new LicensingObject(plugin, project.getArtifactId());
-            if (!add(licensingObject)) {
-                //TODO
-            }
+            add(licensingObject);
         }
     }
 

@@ -62,12 +62,11 @@ public class LicenseUtil {
                     + "\t\t\tGenerates an effective-pom file (\"effective-pom.xml\") in the current folder.\n"
                     + "\t<MavenProjectDirectory>\t\tthe maven project directory containing the pom file\n"
                     + "\n"
-                    + "--addPomToTsv <pomFile> <tsvFile> [<tsvOutput>]"
-                    + "\t\tAnalyzes a maven pom file and generates a table stub, \n" +
+                    + "--addPomToTsv <pomFile> <tsvFile> [<tsvOutput>]\t\tAnalyzes a maven pom file and generates a table stub, \n" +
                         "\t\t\t\t\t\t\t\t\t\t\t\t\twhich contains each referenced (as dependency or plugin) library of the project.\n" +
                         "\t\t\t\t\t\t\t\t\t\t\t\t\tYou should use an EFFECTIVE-POM to get all information.\n" +
-                        "\t\t\t\t\t\t\t\t\t\t\t\t\tIf the <tsvInput> parameter is set, the library informations will be added to the given tsv file.\n"
-                    + "\t<pomFile>\t\tthe pom file to add their referenced libraries from\n"
+                        "\t\t\t\t\t\t\t\t\t\t\t\t\tDependencies with scope \"test\" are not considered.\n"
+                    + "\t<pomFile>\t\tthe pom file embedding the 3rd-party libraries \n"
                     + "\t<tsvFile>\t\tThe analyzed pom information is written to this file. If it exists already, the content is merged.\n"
                     + "\t<tsvOutput>\t\tif set, the generated table stub is written to this file instead of <tsvFile> (OPTIONAL)\n"
                     + "\n"
