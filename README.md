@@ -31,8 +31,8 @@ maven-apache-license-util \<option\> [parameters...]
 --addPomToTsv <pomFile> <tsvFile> [<tsvOutput>]		Analyzes a maven pom file and generates a table stub, 
 													which contains each referenced (as dependency or plugin) library of the project.
 													You should use an EFFECTIVE-POM to get all information.
-													If the <tsvInput> parameter is set, the library informations will be added to the given tsv file.
-	<pomFile>		the pom file to add their referenced libraries from
+													
+	<pomFile>		the pom file embedding the 3rdparty libraries 
 	<tsvFile>		The analyzed pom information is written to this file. If it exists already, the content is merged.
 	<tsvOutput>		if set, the generated table stub is written to this file instead of <tsvFile> (OPTIONAL)
 
