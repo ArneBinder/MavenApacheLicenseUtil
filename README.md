@@ -23,7 +23,7 @@ and helps you to create LICENSE-3RD-PARTY files.
 
 maven-apache-license-util \<option\> [parameters...]
 
-##Options:
+##Options
 ```
 --buildEffectivePom <MavenProjectDirectory>			Generates an effective-pom file ("effective-pom.xml") in the current folder.
 	<MavenProjectDirectory>		the maven project directory containing the pom file
@@ -45,7 +45,7 @@ maven-apache-license-util \<option\> [parameters...]
 
 ## License
 
-Copyright 2015 Arne Binder.
+Copyright (C) Arne Binder
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
