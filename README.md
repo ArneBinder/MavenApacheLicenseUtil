@@ -1,7 +1,7 @@
 #Maven Apache License Util
 
 If you want to publish your project under the [Apache2 license](http://www.apache.org/licenses/LICENSE-2.0) and it 
-includes third-party libraries you have to fulfill their re-publishing requirements. This tool follows [this recommendation] 
+includes third-party libraries you have to fulfill their re-publishing requirements. This tool follows [this recommendation](http://programmers.stackexchange.com/questions/234511/what-is-the-best-practice-for-arranging-third-party-library-licenses-paperwork) 
 and helps you to create LICENSE-3RD-PARTY files. 
 
 [These PAQs](http://www.apache.org/legal/resolved.html) give an overview about licenses which are compatible with the Apache2 license.
