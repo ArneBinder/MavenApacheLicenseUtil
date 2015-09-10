@@ -1,7 +1,9 @@
+package licenseUtil;
+
+import org.apache.maven.cli.MavenCli;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.shared.invoker.*;
 
 import java.io.File;
 import java.io.FileReader;
@@ -12,6 +14,8 @@ import java.util.Arrays;
  * Created by Arne Binder (arne.b.binder@gmail.com) on 10.09.2015.
  */
 public class Utils {
+
+    //final Logger logger = LoggerFactory.getLogger(Utils.class);
 
     public enum ColumnHeader {
         ARTIFACT_ID("artefactId"),
@@ -58,12 +62,8 @@ public class Utils {
         return project;
     }
 
-    public static void buildEffectivePom(File pomfile) throws MavenInvocationException{
-        InvocationRequest request = new DefaultInvocationRequest();
-        request.setPomFile(pomfile);
-        request.setGoals( Arrays.asList("org.apache.maven.plugins:maven-help-plugin:2.2:effective-pom -Doutput=effective-pom.xml") );
-
-        Invoker invoker = new DefaultInvoker();
-        invoker.execute( request );
+    public static void writeEffectivePom(File projectDirectory, String fullEffectivePomFilename){
+        MavenCli cli = new MavenCli();
+        cli.doMain(new String[]{"org.apache.maven.plugins:maven-help-plugin:2.2:effective-pom", "-Doutput="+fullEffectivePomFilename},projectDirectory.getAbsolutePath(), System.out, System.out);
     }
 }

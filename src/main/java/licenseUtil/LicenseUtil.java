@@ -1,5 +1,7 @@
+package licenseUtil;
+
+import org.apache.maven.cli.MavenCli;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.shared.invoker.MavenInvocationException;
 
 import java.io.*;
 
@@ -20,7 +22,7 @@ public class LicenseUtil {
             //System.out.println("CSV READING FINISHED");
             licensingList.addMavenProject(project);
             licensingList.writeToSpreadsheet(args.length>3?args[3]:args[2]);
-        }else if(args[0].equals("repo")){
+        }else if(args[0].equals("writeLicense3rdParty")){
             LicensingList licensingList = new LicensingList();
             licensingList.readFromSpreadsheet(args[2]);
             if(args[1].equals("ALL")){
@@ -38,12 +40,9 @@ public class LicenseUtil {
                 System.out.println(licensingList.getRepoLicensesForModule(args[1]));
             }
         }else if(args[0].equals("buildEffectivePom")){
-
-            try {
-                Utils.buildEffectivePom(new File(args[1]));
-            } catch (MavenInvocationException e) {
-                e.printStackTrace();
-            }
+                Utils.writeEffectivePom(new File(args[1]), (new File("effective-pom.xml")).getAbsolutePath());
+        }else{
+            System.out.println("missing parameters");
         }
 
     }

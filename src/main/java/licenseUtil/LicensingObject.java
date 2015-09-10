@@ -1,7 +1,8 @@
+package licenseUtil;
+
 import org.apache.commons.csv.CSVRecord;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
-import Utils.ColumnHeader;
 
 import java.util.*;
 
@@ -12,24 +13,24 @@ public class LicensingObject extends HashMap<String, String> {
 
 
 
-    static final HashSet<String> keyHeaders = new HashSet<>(Arrays.asList(ColumnHeader.ARTIFACT_ID.value(), ColumnHeader.GROUP_ID.value(), ColumnHeader.VERSION.value()));
+    static final HashSet<String> keyHeaders = new HashSet<String>(Arrays.asList(Utils.ColumnHeader.ARTIFACT_ID.value(), Utils.ColumnHeader.GROUP_ID.value(), Utils.ColumnHeader.VERSION.value()));
 
 
 
     LicensingObject(Dependency dependency, String includingProject) {
         super();
-        put(ColumnHeader.ARTIFACT_ID.value(), dependency.getArtifactId());
-        put(ColumnHeader.GROUP_ID.value(), dependency.getGroupId());
-        put(ColumnHeader.VERSION.value(), dependency.getVersion());
+        put(Utils.ColumnHeader.ARTIFACT_ID.value(), dependency.getArtifactId());
+        put(Utils.ColumnHeader.GROUP_ID.value(), dependency.getGroupId());
+        put(Utils.ColumnHeader.VERSION.value(), dependency.getVersion());
         put(includingProject, "x");
         clean();
     }
 
     LicensingObject(Plugin plugin, String includingProject) {
         super();
-        put(ColumnHeader.ARTIFACT_ID.value(), plugin.getArtifactId());
-        put(ColumnHeader.GROUP_ID.value(), plugin.getGroupId());
-        put(ColumnHeader.VERSION.value(), plugin.getVersion());
+        put(Utils.ColumnHeader.ARTIFACT_ID.value(), plugin.getArtifactId());
+        put(Utils.ColumnHeader.GROUP_ID.value(), plugin.getGroupId());
+        put(Utils.ColumnHeader.VERSION.value(), plugin.getVersion());
         put(includingProject, "x");
         clean();
     }
@@ -45,7 +46,7 @@ public class LicensingObject extends HashMap<String, String> {
     }
 
     public ArrayList<String> getRecord(ArrayList<String> headers) {
-        ArrayList<String> result = new ArrayList<>();
+        ArrayList<String> result = new ArrayList<String>();
         for (String key : headers) {
             if (get(key) != null)
                 result.add(get(key));
@@ -63,15 +64,15 @@ public class LicensingObject extends HashMap<String, String> {
         LicensingObject that = (LicensingObject) aThat;
 
 
-        return ((this.get(ColumnHeader.ARTIFACT_ID.value()) == null || that.get(ColumnHeader.ARTIFACT_ID.value()) == null || this.get(ColumnHeader.ARTIFACT_ID.value()).equals(that.get(ColumnHeader.ARTIFACT_ID.value()))) &&
-                (this.get(ColumnHeader.GROUP_ID.value()) == null || that.get(ColumnHeader.GROUP_ID.value()) == null || this.get(ColumnHeader.GROUP_ID.value()).equals(that.get(ColumnHeader.GROUP_ID.value()))) &&
-                (this.get(ColumnHeader.VERSION.value()) == null || that.get(ColumnHeader.VERSION.value()) == null || this.get(ColumnHeader.VERSION.value()).equals(that.get(ColumnHeader.VERSION.value()))));
+        return ((this.get(Utils.ColumnHeader.ARTIFACT_ID.value()) == null || that.get(Utils.ColumnHeader.ARTIFACT_ID.value()) == null || this.get(Utils.ColumnHeader.ARTIFACT_ID.value()).equals(that.get(Utils.ColumnHeader.ARTIFACT_ID.value()))) &&
+                (this.get(Utils.ColumnHeader.GROUP_ID.value()) == null || that.get(Utils.ColumnHeader.GROUP_ID.value()) == null || this.get(Utils.ColumnHeader.GROUP_ID.value()).equals(that.get(Utils.ColumnHeader.GROUP_ID.value()))) &&
+                (this.get(Utils.ColumnHeader.VERSION.value()) == null || that.get(Utils.ColumnHeader.VERSION.value()) == null || this.get(Utils.ColumnHeader.VERSION.value()).equals(that.get(Utils.ColumnHeader.VERSION.value()))));
     }
 
     public int hashCode() {
-        return get(ColumnHeader.ARTIFACT_ID.value()).hashCode() *
-                get(ColumnHeader.GROUP_ID.value()).hashCode() *
-                get(ColumnHeader.VERSION.value()).hashCode();
+        return get(Utils.ColumnHeader.ARTIFACT_ID.value()).hashCode() *
+                get(Utils.ColumnHeader.GROUP_ID.value()).hashCode() *
+                get(Utils.ColumnHeader.VERSION.value()).hashCode();
     }
 
     public void update(LicensingObject licensingObject) {
@@ -87,9 +88,9 @@ public class LicensingObject extends HashMap<String, String> {
     }
 
     public HashSet<String> getNonFixedHeaders() {
-        HashSet<String> result = new HashSet<>();
+        HashSet<String> result = new HashSet<String>();
         result.addAll(keySet());
-        result.removeAll(new HashSet<>(ColumnHeader.headerValues()));
+        result.removeAll(new HashSet<String>(Utils.ColumnHeader.headerValues()));
         return result;
     }
 

@@ -1,3 +1,5 @@
+package licenseUtil;
+
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
@@ -8,7 +10,6 @@ import org.apache.maven.project.MavenProject;
 
 import java.io.*;
 import java.util.*;
-import Utils.ColumnHeader;
 
 /**
  * Created by Arne Binder (arne.b.binder@gmail.com) on 10.09.2015.
@@ -21,7 +22,7 @@ public class LicensingList extends ArrayList<LicensingObject> {
     static final String licenseTextDirectory = "src/main/resources/templates/";
     static final Boolean aggregateByLibrary = false;
 
-    void readFromSpreadsheet(String spreadsheetFN) throws IOException {
+    public void readFromSpreadsheet(String spreadsheetFN) throws IOException {
         InputStreamReader inputStreamReader = null;
         try {
             inputStreamReader = new InputStreamReader(new FileInputStream(spreadsheetFN), "UTF-8");
@@ -39,7 +40,7 @@ public class LicensingList extends ArrayList<LicensingObject> {
         }
     }
 
-    void writeToSpreadsheet(String spreadsheetFN) throws IOException {
+    public void writeToSpreadsheet(String spreadsheetFN) throws IOException {
         FileWriter fileWriter = null;
         CSVPrinter csvFilePrinter = null;
 
@@ -53,16 +54,16 @@ public class LicensingList extends ArrayList<LicensingObject> {
             //initialize CSVPrinter object
             csvFilePrinter = new CSVPrinter(fileWriter, csvFileFormat);
 
-            ArrayList<String> headers = new ArrayList<>();
-            headers.addAll(ColumnHeader.headerValues());
+            ArrayList<String> headers = new ArrayList<String>();
+            headers.addAll(Utils.ColumnHeader.headerValues());
             headers.addAll(getNonFixedHeaders());
             //Create CSV file header
             csvFilePrinter.printRecord(headers);
             for (LicensingObject licensingObject : this) {
 
-                String version = licensingObject.get(ColumnHeader.VERSION.value());
+                String version = licensingObject.get(Utils.ColumnHeader.VERSION.value());
                 if(version!=null && !version.startsWith("'") && !version.endsWith("'") ){
-                    licensingObject.put(ColumnHeader.VERSION.value(), "'"+version+"'");
+                    licensingObject.put(Utils.ColumnHeader.VERSION.value(), "'"+version+"'");
                 }
                 csvFilePrinter.printRecord(licensingObject.getRecord(headers));
             }
@@ -86,7 +87,7 @@ public class LicensingList extends ArrayList<LicensingObject> {
 
     public String getRepoLicensesForModule(String moduleName) throws IOException{
         String result ="3rd party license information for \""+moduleName+"\"\n";
-        HashMap<String, HashSet<String>> licenseList = new HashMap<>();
+        HashMap<String, HashSet<String>> licenseList = new HashMap<String, HashSet<String>>();
         for(LicensingObject licensingObject: this){
 
             licensingObject.clean();
@@ -95,13 +96,13 @@ public class LicensingList extends ArrayList<LicensingObject> {
             if(licensingObject.containsKey(moduleName)){
                 HashSet<String> licenseElement;
                 //String licenseKey = licensingObject.get(ColumnHeader.LICENSE_SHORT.value())+columnDelimiter+licensingObject.get(ColumnHeader.LICENSE.value());
-                String licenseKey = licensingObject.get(ColumnHeader.LICENSE.value());
+                String licenseKey = licensingObject.get(Utils.ColumnHeader.LICENSE.value());
                 if(!licenseList.containsKey(licenseKey)){
-                    licenseElement = new HashSet<>();
+                    licenseElement = new HashSet<String>();
                 }else {
                     licenseElement = licenseList.get(licenseKey);
                 }
-                String libString = licensingObject.get(ColumnHeader.LIBRARY_NAME.value());
+                String libString = licensingObject.get(Utils.ColumnHeader.LIBRARY_NAME.value());
                 if(libString==null){
                     libString = "";
                 }else{
@@ -109,8 +110,8 @@ public class LicensingList extends ArrayList<LicensingObject> {
                 }
 
                 if(libString.trim().equals("") || !aggregateByLibrary){
-                    libString += licensingObject.get(ColumnHeader.ARTIFACT_ID.value());
-                    String version = licensingObject.get(ColumnHeader.VERSION.value());
+                    libString += licensingObject.get(Utils.ColumnHeader.ARTIFACT_ID.value());
+                    String version = licensingObject.get(Utils.ColumnHeader.VERSION.value());
                     if(version!=null){
                         if(version.startsWith("'"))
                             version = version.substring(1, version.length());
@@ -119,9 +120,9 @@ public class LicensingList extends ArrayList<LicensingObject> {
                         libString +=":"+version;
                     }
                 }
-                if(licensingObject.containsKey(ColumnHeader.COPYRIGHT_INFORMATION.value())){
+                if(licensingObject.containsKey(Utils.ColumnHeader.COPYRIGHT_INFORMATION.value())){
 
-                    libString += ", Copyright "+licensingObject.get(ColumnHeader.COPYRIGHT_INFORMATION.value());
+                    libString += ", Copyright "+licensingObject.get(Utils.ColumnHeader.COPYRIGHT_INFORMATION.value());
                 }
                 //if(!libStrings.contains(libString)) {
                 licenseElement.add(libString);
@@ -130,7 +131,7 @@ public class LicensingList extends ArrayList<LicensingObject> {
                 licenseList.put(licenseKey,licenseElement);
             }
         }
-        ArrayList<String> sortedLicenseNames = new ArrayList<>(licenseList.keySet());
+        ArrayList<String> sortedLicenseNames = new ArrayList<String>(licenseList.keySet());
         sortedLicenseNames.remove(null);
         Collections.sort(sortedLicenseNames);
         for(String key: sortedLicenseNames){
@@ -149,7 +150,7 @@ public class LicensingList extends ArrayList<LicensingObject> {
                     if(line.toLowerCase().contains(libraryListPlaceholder)){
                         //result += licenseList.get(key);
                         result += "applies to:\n";
-                        ArrayList<String> sortedLibraryInfos = new ArrayList<>(licenseList.get(key));
+                        ArrayList<String> sortedLibraryInfos = new ArrayList<String>(licenseList.get(key));
                         Collections.sort(sortedLibraryInfos);
                         for(String libraryInfo: sortedLibraryInfos){
                             result += "\t- "+ libraryInfo+"\n";
@@ -165,7 +166,7 @@ public class LicensingList extends ArrayList<LicensingObject> {
                 result += "\nCOULD NOT FIND LICENSE TEMPLATE FILE \""+f.getPath()+"\"\n";
                 result += "\n-----------------------------------------------------------------------------\n";
                 result += "applies to:\n";
-                ArrayList<String> sortedLibraryInfos = new ArrayList<>(licenseList.get(key));
+                ArrayList<String> sortedLibraryInfos = new ArrayList<String>(licenseList.get(key));
                 Collections.sort(sortedLibraryInfos);
                 for(String libraryInfo: sortedLibraryInfos){
                     result += "\t- "+ libraryInfo+"\n";
@@ -198,7 +199,7 @@ public class LicensingList extends ArrayList<LicensingObject> {
     }
 
     public HashSet<String> getNonFixedHeaders() {
-        HashSet<String> result = new HashSet<>();
+        HashSet<String> result = new HashSet<String>();
         for (LicensingObject licensingObject : this) {
             result.addAll(licensingObject.getNonFixedHeaders());
         }
