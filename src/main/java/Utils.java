@@ -1,10 +1,12 @@
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.shared.invoker.*;
 
 import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * Created by Arne Binder (arne.b.binder@gmail.com) on 10.09.2015.
@@ -29,7 +31,7 @@ public class Utils {
             return this.headerValue;
         }
         public static ArrayList<String> headerValues(){
-            ArrayList<String> result = new ArrayList<>();
+            ArrayList<String> result = new ArrayList<String>();
             for(ColumnHeader header: ColumnHeader.class.getEnumConstants()){
                 result.add(header.value());
             }
@@ -54,5 +56,14 @@ public class Utils {
         }
         MavenProject project = new MavenProject(model);
         return project;
+    }
+
+    public static void buildEffectivePom(File pomfile) throws MavenInvocationException{
+        InvocationRequest request = new DefaultInvocationRequest();
+        request.setPomFile(pomfile);
+        request.setGoals( Arrays.asList("org.apache.maven.plugins:maven-help-plugin:2.2:effective-pom -Doutput=effective-pom.xml") );
+
+        Invoker invoker = new DefaultInvoker();
+        invoker.execute( request );
     }
 }

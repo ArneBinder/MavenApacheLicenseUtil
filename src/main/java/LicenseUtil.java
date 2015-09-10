@@ -1,4 +1,5 @@
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.shared.invoker.MavenInvocationException;
 
 import java.io.*;
 
@@ -35,6 +36,13 @@ public class LicenseUtil {
                 }
             }else {
                 System.out.println(licensingList.getRepoLicensesForModule(args[1]));
+            }
+        }else if(args[0].equals("buildEffectivePom")){
+
+            try {
+                Utils.buildEffectivePom(new File(args[1]));
+            } catch (MavenInvocationException e) {
+                e.printStackTrace();
             }
         }
 
