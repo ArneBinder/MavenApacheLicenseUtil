@@ -28,6 +28,10 @@ import java.util.*;
  */
 public class LicensingObject extends HashMap<String, String> {
 
+    static final char textMarker = '\'';
+    private final static Set<Utils.ColumnHeader> MARKED_AS_TEXT = Collections.unmodifiableSet(
+            new HashSet<>(Arrays.asList(Utils.ColumnHeader.VERSION)));
+
     final Logger logger = LoggerFactory.getLogger(LicensingObject.class);
     static final HashSet<String> keyHeaders = new HashSet<String>(Arrays.asList(Utils.ColumnHeader.ARTIFACT_ID.value(), Utils.ColumnHeader.GROUP_ID.value(), Utils.ColumnHeader.VERSION.value()));
 
@@ -54,16 +58,26 @@ public class LicensingObject extends HashMap<String, String> {
         Map<String, String> recordMap = record.toMap();
         for (String key : recordMap.keySet()) {
             String value = recordMap.get(key);
-            if (value != null && !value.equals(""))
-                put(key, recordMap.get(key));
+            if (value != null && !value.equals("")) {
+                String current = recordMap.get(key);
+                // remove text marker
+                if (value.length() > 1 && value.charAt(0) == textMarker && value.charAt(value.length() - 1) == textMarker) {
+                    put(key, current.substring(1,current.length()-1));
+                } else
+                    put(key, current);
+            }
         }
     }
 
     public ArrayList<String> getRecord(ArrayList<String> headers) {
         ArrayList<String> result = new ArrayList<String>();
         for (String key : headers) {
-            if (get(key) != null)
-                result.add(get(key));
+            String value = get(key);
+            if (value != null)
+                if (MARKED_AS_TEXT.contains(key)){
+                    result.add(textMarker + value + textMarker);
+                }else
+                    result.add(value);
             else {
                 result.add("");
             }

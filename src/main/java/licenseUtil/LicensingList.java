@@ -81,11 +81,6 @@ public class LicensingList extends ArrayList<LicensingObject> {
             //Create CSV file header
             csvFilePrinter.printRecord(headers);
             for (LicensingObject licensingObject : this) {
-
-                String version = licensingObject.get(Utils.ColumnHeader.VERSION.value());
-                if(version!=null && !version.startsWith("'") && !version.endsWith("'") ){
-                    licensingObject.put(Utils.ColumnHeader.VERSION.value(), "'"+version+"'");
-                }
                 csvFilePrinter.printRecord(licensingObject.getRecord(headers));
             }
             logger.info("CSV file was created successfully");

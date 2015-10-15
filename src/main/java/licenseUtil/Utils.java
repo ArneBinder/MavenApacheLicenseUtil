@@ -19,6 +19,10 @@ import org.apache.maven.cli.MavenCli;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
+import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.errors.*;
+import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,5 +108,14 @@ public class Utils {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static void updateRepository(String gitDir) throws IOException, GitAPIException {
+        // Open an existing repository
+        Repository existingRepo = new FileRepositoryBuilder()
+                .setGitDir(new File(gitDir+"/.git"))
+                .build();
+        Git git = new Git(existingRepo);
+        git.pull().call();
     }
 }
