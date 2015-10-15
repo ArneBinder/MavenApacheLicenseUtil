@@ -9,7 +9,7 @@ and helps you to create LICENSE-3RD-PARTY files.
 ##The workflow is as follows:
 
 1. Generate an effective-pom file for the project you want to add a LICENSE-3RD-PARTY file:
-	- `maven-apache-license-util --buildEffectivePom \<MavenProjectDirectory\>`
+	- `maven-apache-license-util --buildEffectivePom <MavenProjectDirectory>`
 2. Add it to the tsv-file (which doesnt exists in the first run):
 	- `maven-apache-license-util --addPomToTsv effective-pom.xml licenses.stub.tsv`
 3. Repeat step 1 and 2 until all projects you want to have LICENSE-3RD-PARTY files for are added
@@ -23,7 +23,7 @@ and helps you to create LICENSE-3RD-PARTY files.
 
 maven-apache-license-util \<option\> [parameters...]
 
-##Options:
+##Options
 ```
 --buildEffectivePom <MavenProjectDirectory>			Generates an effective-pom file ("effective-pom.xml") in the current folder.
 	<MavenProjectDirectory>		the maven project directory containing the pom file
@@ -45,7 +45,7 @@ maven-apache-license-util \<option\> [parameters...]
 
 ## License
 
-Copyright 2015 Arne Binder.
+Copyright (C) Arne Binder
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
