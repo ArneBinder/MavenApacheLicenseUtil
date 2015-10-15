@@ -110,12 +110,20 @@ public class Utils {
         }
     }
 
-    public static void updateRepository(String gitDir) throws IOException, GitAPIException {
-        // Open an existing repository
-        Repository existingRepo = new FileRepositoryBuilder()
-                .setGitDir(new File(gitDir+"/.git"))
-                .build();
-        Git git = new Git(existingRepo);
-        git.pull().call();
+    public static void updateRepository(String gitDir) {
+        try {
+            // Open an existing repository
+            Repository existingRepo = new FileRepositoryBuilder()
+                    .setGitDir(new File(gitDir + "/.git"))
+                    .build();
+            Git git = new Git(existingRepo);
+
+            git.pull().call();
+        } catch (GitAPIException e) {
+            logger.warn("Could not update local repository: \""+gitDir+"\" with git pull.");
+        } catch (IOException e){
+            logger.warn("Could not open local git repository directory: \""+gitDir+"\"");
+        }
+
     }
 }

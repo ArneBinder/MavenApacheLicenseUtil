@@ -13,6 +13,6 @@ public class UtilsTest {
 
     @Test
     public void testUpdateRepository() throws IOException, GitAPIException {
-        Utils.updateRepository("../Freme/Broker");
+        Utils.updateRepository(".");
     }
 }
