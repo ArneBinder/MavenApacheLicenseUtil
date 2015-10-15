@@ -76,11 +76,19 @@ public class LicensingObject extends HashMap<String, String> {
         if (this == aThat) return true;
         if (!(aThat instanceof LicensingObject)) return false;
         LicensingObject that = (LicensingObject) aThat;
+        boolean result = false;
+        /*if((this.get(Utils.ColumnHeader.ARTIFACT_ID.value()) != null) && (this.get(Utils.ColumnHeader.ARTIFACT_ID.value()).equals("common"))
+                //&&(this.get(Utils.ColumnHeader.GROUP_ID.value()) == null) && (this.get(Utils.ColumnHeader.GROUP_ID.value()).equals("eu.freme"))
+                //&&(that.get(Utils.ColumnHeader.ARTIFACT_ID.value()) != null) && (that.get(Utils.ColumnHeader.ARTIFACT_ID.value()).equals("common"))
+                &&(that.get(Utils.ColumnHeader.GROUP_ID.value()) != null) && (that.get(Utils.ColumnHeader.GROUP_ID.value()).equals("eu.freme"))
+                ){
+            System.out.println();
+        }*/
 
-
-        return ((this.get(Utils.ColumnHeader.ARTIFACT_ID.value()) == null || that.get(Utils.ColumnHeader.ARTIFACT_ID.value()) == null || this.get(Utils.ColumnHeader.ARTIFACT_ID.value()).equals(that.get(Utils.ColumnHeader.ARTIFACT_ID.value()))) &&
+        result = ((this.get(Utils.ColumnHeader.ARTIFACT_ID.value()) == null || that.get(Utils.ColumnHeader.ARTIFACT_ID.value()) == null || this.get(Utils.ColumnHeader.ARTIFACT_ID.value()).equals(that.get(Utils.ColumnHeader.ARTIFACT_ID.value()))) &&
                 (this.get(Utils.ColumnHeader.GROUP_ID.value()) == null || that.get(Utils.ColumnHeader.GROUP_ID.value()) == null || this.get(Utils.ColumnHeader.GROUP_ID.value()).equals(that.get(Utils.ColumnHeader.GROUP_ID.value()))) &&
                 (this.get(Utils.ColumnHeader.VERSION.value()) == null || that.get(Utils.ColumnHeader.VERSION.value()) == null || this.get(Utils.ColumnHeader.VERSION.value()).equals(that.get(Utils.ColumnHeader.VERSION.value()))));
+        return result;
     }
 
     public int hashCode() {
