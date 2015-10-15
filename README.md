@@ -1,4 +1,4 @@
-#Maven Apache License Util
+#Maven Apache License Util TEST
 
 If you want to publish your project under the [Apache2 license](http://www.apache.org/licenses/LICENSE-2.0) and it 
 includes third-party libraries you have to fulfill their re-publishing requirements. This tool follows [this recommendation](http://programmers.stackexchange.com/questions/234511/what-is-the-best-practice-for-arranging-third-party-library-licenses-paperwork) 
