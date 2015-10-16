@@ -9,7 +9,7 @@ and helps you to create LICENSE-3RD-PARTY files.
 ##The workflow is as follows:
 
 
-1. Update local repositories, build effective-poms and add pom content to `<license.stub.tsv>` for all projects, which are direct subfolders of `<superDirectory>`, by:
+1. Update local repositories, build effective-poms and add pom content to `<license.stub.tsv>` for all projects, which are direct subfolders of `<superDirectory>`, by executing:
 	- `maven-apache-license-util --processProjectsInFolder <superDirectory> <license.stub.tsv> <currentReleaseVersion>`
 	
 	`<currentReleaseVersion>` should be a value, which marks your current release.
