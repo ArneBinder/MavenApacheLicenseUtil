@@ -15,6 +15,7 @@
  */
 package licenseUtil;
 
+import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.maven.project.MavenProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,8 +40,9 @@ public class LicenseUtil {
             if (f.exists() && !f.isDirectory()) {
                 licensingList.readFromSpreadsheet(args[2]);
             }
-            licensingList.addMavenProject(project);
-            licensingList.writeToSpreadsheet(args.length > 3 ? args[3] : args[2]);
+            String projectVersion = args[3];
+            licensingList.addMavenProject(project, projectVersion);
+            licensingList.writeToSpreadsheet(args[2]);
         }else if(args[0].equals("--writeLicense3rdParty")){
             LicensingList licensingList = new LicensingList();
             licensingList.readFromSpreadsheet(args[1]);
@@ -53,41 +55,66 @@ public class LicenseUtil {
             }
         }else if(args[0].equals("--buildEffectivePom")){
                 Utils.writeEffectivePom(new File(args[1]), (new File("effective-pom.xml")).getAbsolutePath());
+        }else if(args[0].equals("--processProjectsInFolder")){
+            File directory = new File(args[1]);
+            File[] subdirs = directory.listFiles((FileFilter) DirectoryFileFilter.DIRECTORY);
+
+            String licenseStubFN = args[2];
+
+            String projectVersion = args[3];
+            for (File dir : subdirs) {
+                logger.info("process: " + dir.getName());
+                logger.info("update local repository");
+                Utils.updateRepository(dir.getPath());
+                logger.info("build effective-pom");
+                File pom = new File(dir.getPath()+"/effective-pom.xml");
+                Utils.writeEffectivePom(new File(dir.getPath()), pom.getAbsolutePath());
+                logger.info("add pom content to tsv");
+
+                MavenProject project = Utils.readPom(pom);
+                LicensingList licensingList = new LicensingList();
+                File f = new File(licenseStubFN);
+                if (f.exists() && !f.isDirectory()) {
+                    licensingList.readFromSpreadsheet(licenseStubFN);
+                }
+                licensingList.addMavenProject(project, projectVersion);
+                licensingList.writeToSpreadsheet(licenseStubFN);
+            }
         }else if(args[0].equals("--help")){
             logger.info(
                     "\nusage: maven-license-util <option> [parameters...]\n"
-                    + "\n"
-                    + "possible options:\n"
-                    + "--buildEffectivePom <MavenProjectDirectory>"
-                    + "\t\t\tGenerates an effective-pom file (\"effective-pom.xml\") in the current folder.\n"
-                    + "\t<MavenProjectDirectory>\t\tthe maven project directory containing the pom file\n"
-                    + "\n"
-                    + "--addPomToTsv <pomFile> <tsvFile> [<tsvOutput>]\t\tAnalyzes a maven pom file and generates a table stub, \n" +
-                        "\t\t\t\t\t\t\t\t\t\t\t\t\twhich contains each referenced (as dependency or plugin) library of the project.\n" +
-                        "\t\t\t\t\t\t\t\t\t\t\t\t\tYou should use an EFFECTIVE-POM to get all information.\n" +
-                        "\t\t\t\t\t\t\t\t\t\t\t\t\tDependencies with scope \"test\" are not considered.\n"
-                    + "\t<pomFile>\t\tthe pom file embedding the 3rd-party libraries \n"
-                    + "\t<tsvFile>\t\tThe analyzed pom information is written to this file. If it exists already, the content is merged.\n"
-                    + "\t<tsvOutput>\t\tif set, the generated table stub is written to this file instead of <tsvFile> (OPTIONAL)\n"
-                    + "\n"
-                    + "--writeLicense3rdParty <tsvFile> (ALL|<project>)"
-                    + "\tUse the information of the <tsvFile> and generate LICENSE-3RD-PARTY files via templates from the resources/templates folder.\n"
-                    + "\t<tsvFile>\t\tThe enhanced (by you) tsv table stub\n"
-                    + "\t<project>\t\tIf you just want to have the LICENSE-3RD-PARTY file of a certain project, use the maven artifactId.\n"
+                            + "\n"
+                            + "possible options:\n"
+                            + "--buildEffectivePom <MavenProjectDirectory>"
+                            + "\t\t\tGenerates an effective-pom file (\"effective-pom.xml\") in the current folder.\n"
+                            + "\t<MavenProjectDirectory>\t\tthe maven project directory containing the pom file\n"
+                            + "\n"
+                            + "--addPomToTsv <pomFile> <tsvFile> [<tsvOutput>]\t\tAnalyzes a maven pom file and generates a table stub, \n" +
+                            "\t\t\t\t\t\t\t\t\t\t\t\t\twhich contains each referenced (as dependency or plugin) library of the project.\n" +
+                            "\t\t\t\t\t\t\t\t\t\t\t\t\tYou should use an EFFECTIVE-POM to get all information.\n" +
+                            "\t\t\t\t\t\t\t\t\t\t\t\t\tDependencies with scope \"test\" are not considered.\n"
+                            + "\t<pomFile>\t\tthe pom file embedding the 3rd-party libraries \n"
+                            + "\t<tsvFile>\t\tThe analyzed pom information is written to this file. If it exists already, the content is merged.\n"
+                            + "\t<tsvOutput>\t\tif set, the generated table stub is written to this file instead of <tsvFile> (OPTIONAL)\n"
+                            + "\n"
+                            + "--writeLicense3rdParty <tsvFile> (ALL|<project>)"
+                            + "\tUse the information of the <tsvFile> and generate LICENSE-3RD-PARTY files via templates from the resources/templates folder.\n"
+                            + "\t<tsvFile>\t\tThe enhanced (by you) tsv table stub\n"
+                            + "\t<project>\t\tIf you just want to have the LICENSE-3RD-PARTY file of a certain project, use the maven artifactId.\n"
                             + "\t\t\t\t\t\"ALL\" creates the LICENSE-3RD-PARTY files for all projects appearing in the <tsvFile>.\n"
-                    + "\n"
-                    + "The workflow is as follows:\n"
-                    + "\t1. Generate an effective-pom file for the project you want to add a LICENSE-3RD-PARTY file:\n" +
+                            + "\n"
+                            + "The workflow is as follows:\n"
+                            + "\t1. Generate an effective-pom file for the project you want to add a LICENSE-3RD-PARTY file:\n" +
                             "\t\t\tmaven-license-util --buildEffectivePom <MavenProjectDirectory>\n"
-                    + "\t2. Add it to the tsv-file (which doesnt exists in the first run):\n" +
+                            + "\t2. Add it to the tsv-file (which doesnt exists in the first run):\n" +
                             "\t\t\tmaven-license-util --addPomToTsv effective-pom.xml licenses.stub.tsv\n"
-                    + "\t3. Repeat step 1 and 2 until all projects you want to have LICENSE-3RD-PARTY files for are added\n"
-                    + "\t4. Enhance the licenses.stub.tsv by yourself:\n" +
+                            + "\t3. Repeat step 1 and 2 until all projects you want to have LICENSE-3RD-PARTY files for are added\n"
+                            + "\t4. Enhance the licenses.stub.tsv by yourself:\n" +
                             "\t\t\tEspecially fill the \"license\" column according to the filenames of the license templates \n" +
                             "\t\t\tin resources/templates (APACHE2, BSD, CDDL, EPLV1, GPLV2. GPLV3, H2, JSON, LGPLV3, MIT).\n" +
                             "\t\t\tFurthermore, fill the column \"bundle\" for better readability and \"copyRightInformation\",\n" +
                             "\t\t\tif this information is available.\n"
-                    + "\t5. Create the LICENSE-3RD-PARTY files by\n" +
+                            + "\t5. Create the LICENSE-3RD-PARTY files by\n" +
                             "\t\t\t--writeLicense3rdParty licenses.enhanced.tsv ALL"
 
             );

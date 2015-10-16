@@ -28,28 +28,28 @@ import java.util.*;
  */
 public class LicensingObject extends HashMap<String, String> {
 
-    static final char textMarker = '\'';
-    private final static Set<Utils.ColumnHeader> MARKED_AS_TEXT = Collections.unmodifiableSet(
-            new HashSet<>(Arrays.asList(Utils.ColumnHeader.VERSION)));
+    static final char textMarker = '"';
+    private final static Set<String> MARKED_AS_TEXT = Collections.unmodifiableSet(
+            new HashSet<>(Arrays.asList(Utils.ColumnHeader.VERSION.value())));
 
     final Logger logger = LoggerFactory.getLogger(LicensingObject.class);
     static final HashSet<String> keyHeaders = new HashSet<String>(Arrays.asList(Utils.ColumnHeader.ARTIFACT_ID.value(), Utils.ColumnHeader.GROUP_ID.value(), Utils.ColumnHeader.VERSION.value()));
 
-    LicensingObject(Dependency dependency, String includingProject) {
+    LicensingObject(Dependency dependency, String includingProject, String version) {
         super();
         put(Utils.ColumnHeader.ARTIFACT_ID.value(), dependency.getArtifactId());
         put(Utils.ColumnHeader.GROUP_ID.value(), dependency.getGroupId());
         put(Utils.ColumnHeader.VERSION.value(), dependency.getVersion());
-        put(includingProject, "x");
+        put(includingProject, version);
         clean();
     }
 
-    LicensingObject(Plugin plugin, String includingProject) {
+    LicensingObject(Plugin plugin, String includingProject, String version) {
         super();
         put(Utils.ColumnHeader.ARTIFACT_ID.value(), plugin.getArtifactId());
         put(Utils.ColumnHeader.GROUP_ID.value(), plugin.getGroupId());
         put(Utils.ColumnHeader.VERSION.value(), plugin.getVersion());
-        put(includingProject, "x");
+        put(includingProject, version);
         clean();
     }
 
@@ -59,7 +59,7 @@ public class LicensingObject extends HashMap<String, String> {
         for (String key : recordMap.keySet()) {
             String value = recordMap.get(key);
             if (value != null && !value.equals("")) {
-                String current = recordMap.get(key);
+                String current = recordMap.get(key).trim();
                 // remove text marker
                 if (value.length() > 1 && value.charAt(0) == textMarker && value.charAt(value.length() - 1) == textMarker) {
                     put(key, current.substring(1,current.length()-1));

@@ -189,20 +189,20 @@ public class LicensingList extends ArrayList<LicensingObject> {
     }
 
 
-    public void addMavenProject(MavenProject project) {
+    public void addMavenProject(MavenProject project, String version) {
         logger.debug("add pom content to current list...");
         List<Dependency> dependencies = project.getDependencies();
 
         for (Dependency dependency : dependencies) {
             if(dependency.getScope()==null || !dependency.getScope().equals(excludedScope)) {
-                LicensingObject licensingObject = new LicensingObject(dependency, project.getArtifactId());
+                LicensingObject licensingObject = new LicensingObject(dependency, project.getArtifactId(), version);
                 add(licensingObject);
             }
         }
 
         List<Plugin> plugins = project.getBuild().getPlugins();
         for (Plugin plugin : plugins) {
-            LicensingObject licensingObject = new LicensingObject(plugin, project.getArtifactId());
+            LicensingObject licensingObject = new LicensingObject(plugin, project.getArtifactId(), version);
             add(licensingObject);
         }
     }

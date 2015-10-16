@@ -8,10 +8,25 @@ and helps you to create LICENSE-3RD-PARTY files.
 
 ##The workflow is as follows:
 
+
+1. Update local repositories, build effective-poms and add pom content to <license.stub.tsv> for all projects, which are direct subfolders of <superDirectory>:
+	- `maven-apache-license-util --processProjectsInFolder <superDirectory> <license.stub.tsv> <currentReleaseVersion>`
+	
+	`<currentReleaseVersion>` should be a value, which marks your current release.
+	If you have an <licenses.enhanced.tsv> from an earlier release, use this as <license.stub.tsv>. The former license information will be kept, just the old <currentReleaseVersion> value will be overwritten, if the library is still in use for the current release.
+	NOTE: This will overwrite the old <licenses.enhanced.tsv>. 
+2. Enhance the licenses.stub.tsv by yourself:
+   	- Especially fill the "license" column according to the filenames of the license templates in resources/templates (APACHE2, BSD, CDDL, EPLV1, GPLV2. GPLV3, H2, JSON, LGPLV3, MIT).
+   	- Furthermore, fill the column "bundle" for better readability and "copyRightInformation", if this information is available.
+3. Create the LICENSE-3RD-PARTY files by
+	- `maven-apache-license-util --writeLicense3rdParty <licenses.enhanced.tsv> ALL`
+
+###Old workflow:
+
 1. Generate an effective-pom file for the project you want to add a LICENSE-3RD-PARTY file:
 	- `maven-apache-license-util --buildEffectivePom <MavenProjectDirectory>`
 2. Add it to the tsv-file (which doesnt exists in the first run):
-	- `maven-apache-license-util --addPomToTsv effective-pom.xml licenses.stub.tsv`
+	- `maven-apache-license-util --addPomToTsv effective-pom.xml licenses.stub.tsv <currentReleaseVersion>`
 3. Repeat step 1 and 2 until all projects you want to have LICENSE-3RD-PARTY files for are added
 4. Enhance the licenses.stub.tsv by yourself:
 	- Especially fill the "license" column according to the filenames of the license templates in resources/templates (APACHE2, BSD, CDDL, EPLV1, GPLV2. GPLV3, H2, JSON, LGPLV3, MIT).
@@ -25,6 +40,11 @@ maven-apache-license-util \<option\> [parameters...]
 
 ##Options
 ```
+--processProjectsInFolder 
+	<superDirectory>		The directory containing the project directories.
+	<tsvFile>				The analyzed pom information is written to this file. If it exists already, the content is merged.
+	<currentReleaseVersion>	This value will be written into the project columns of the tsv if the project uses the library specified by the current row
+	
 --buildEffectivePom <MavenProjectDirectory>			Generates an effective-pom file ("effective-pom.xml") in the current folder.
 	<MavenProjectDirectory>		the maven project directory containing the pom file
 
@@ -35,7 +55,7 @@ maven-apache-license-util \<option\> [parameters...]
 													
 	<pomFile>		the pom file embedding the 3rd-party libraries 
 	<tsvFile>		The analyzed pom information is written to this file. If it exists already, the content is merged.
-	<tsvOutput>		if set, the generated table stub is written to this file instead of <tsvFile> (OPTIONAL)
+	<currentReleaseVersion>		will be written into the project columns if the project uses the library specified by the current row
 
 --writeLicense3rdParty <tsvFile> (ALL|<project>)	Use the information of the <tsvFile> and generate LICENSE-3RD-PARTY files via templates from the resources/templates folder.
 	<tsvFile>		The enhanced (by you) tsv table stub
