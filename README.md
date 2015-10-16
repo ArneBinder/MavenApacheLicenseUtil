@@ -23,19 +23,6 @@ and helps you to create LICENSE-3RD-PARTY files.
 3. Create the LICENSE-3RD-PARTY files by
 	- `maven-apache-license-util --writeLicense3rdParty <licenses.enhanced.tsv> ALL`
 
-###Old workflow:
-
-1. Generate an effective-pom file for the project you want to add a LICENSE-3RD-PARTY file:
-	- `maven-apache-license-util --buildEffectivePom <MavenProjectDirectory>`
-2. Add it to the tsv-file (which doesnt exists in the first run):
-	- `maven-apache-license-util --addPomToTsv effective-pom.xml licenses.stub.tsv <currentReleaseVersion>`
-3. Repeat step 1 and 2 until all projects you want to have LICENSE-3RD-PARTY files for are added
-4. Enhance the licenses.stub.tsv by yourself:
-	- Especially fill the "license" column according to the filenames of the license templates in resources/templates (APACHE2, BSD, CDDL, EPLV1, GPLV2. GPLV3, H2, JSON, LGPLV3, MIT).
-	- Furthermore, fill the column "bundle" for better readability and "copyRightInformation", if this information is available.
-5. Create the LICENSE-3RD-PARTY files by
-	- `maven-apache-license-util --writeLicense3rdParty licenses.enhanced.tsv ALL`
-
 ##Usage
 
 `maven-apache-license-util <option> [parameters...]`
