@@ -9,12 +9,12 @@ and helps you to create LICENSE-3RD-PARTY files.
 ##The workflow is as follows:
 
 
-1. Update local repositories, build effective-poms and add pom content to <license.stub.tsv> for all projects, which are direct subfolders of <superDirectory>:
+1. Update local repositories, build effective-poms and add pom content to `<license.stub.tsv>` for all projects, which are direct subfolders of `<superDirectory>`:
 	- `maven-apache-license-util --processProjectsInFolder <superDirectory> <license.stub.tsv> <currentReleaseVersion>`
 	
 	`<currentReleaseVersion>` should be a value, which marks your current release.
-	If you have an <licenses.enhanced.tsv> from an earlier release, use this as <license.stub.tsv>. The former license information will be kept, just the old <currentReleaseVersion> value will be overwritten, if the library is still in use for the current release.
-	NOTE: This will overwrite the old <licenses.enhanced.tsv>. 
+	If you have an `<licenses.enhanced.tsv>` from an earlier release, use this as `<license.stub.tsv>`. The former license information will be kept, just the old `<currentReleaseVersion>` value will be overwritten, if the library is still in use for the current release.
+	NOTE: This will overwrite the old `<licenses.enhanced.tsv>`. 
 2. Enhance the licenses.stub.tsv by yourself:
    	- Especially fill the "license" column according to the filenames of the license templates in resources/templates (APACHE2, BSD, CDDL, EPLV1, GPLV2. GPLV3, H2, JSON, LGPLV3, MIT).
    	- Furthermore, fill the column "bundle" for better readability and "copyRightInformation", if this information is available.
@@ -36,7 +36,7 @@ and helps you to create LICENSE-3RD-PARTY files.
 
 ##Usage
 
-maven-apache-license-util \<option\> [parameters...]
+`maven-apache-license-util <option> [parameters...]`
 
 ##Options
 ```
@@ -61,7 +61,7 @@ maven-apache-license-util \<option\> [parameters...]
 	<tsvFile>		The enhanced (by you) tsv table stub
 	<project>		If you just want to have the LICENSE-3RD-PARTY file of a certain project, use the maven artifactId.
 					"ALL" creates the LICENSE-3RD-PARTY files for all projects appearing in the <tsvFile>.
-````
+```
 
 ## License
 
