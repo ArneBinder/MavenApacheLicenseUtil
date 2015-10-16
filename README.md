@@ -14,10 +14,12 @@ and helps you to create LICENSE-3RD-PARTY files.
 	
 	`<currentReleaseVersion>` should be a value, which marks your current release.
 	If you have an `<licenses.enhanced.tsv>` from an earlier release, use this as `<license.stub.tsv>`. The former license information will be kept, just the old `<currentReleaseVersion>` value will be overwritten, if the library is still in use for the current release.
+
 	NOTE: This will overwrite the old `<licenses.enhanced.tsv>`. 
 2. Enhance the licenses.stub.tsv by yourself:
    	- Especially fill the "license" column according to the filenames of the license templates in resources/templates (APACHE2, BSD, CDDL, EPLV1, GPLV2. GPLV3, H2, JSON, LGPLV3, MIT).
    	- Furthermore, fill the column "bundle" for better readability and "copyRightInformation", if this information is available.
+  
 3. Create the LICENSE-3RD-PARTY files by
 	- `maven-apache-license-util --writeLicense3rdParty <licenses.enhanced.tsv> ALL`
 
