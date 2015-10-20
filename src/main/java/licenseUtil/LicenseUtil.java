@@ -58,7 +58,7 @@ public class LicenseUtil {
 
             LicensingList licensingList = new LicensingList();
             licensingList.readFromSpreadsheet(spreadSheetFN, currentVersion);
-            if(processModule.equals("ALL")){
+            if(processModule.toUpperCase().equals("ALL")){
                 for(String module: licensingList.getNonFixedHeaders()){
                     Utils.write(licensingList.getRepoLicensesForModule(module), "LICENSE-3RD-PARTY."+module);
                 }
