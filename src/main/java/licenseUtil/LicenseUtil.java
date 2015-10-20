@@ -35,7 +35,7 @@ public class LicenseUtil {
             logger.error("Missing parameters. Use --help to get a list of the possible options.");
         }else if(args[0].equals("--addPomToTsv")){
             if(args.length<4)
-                logger.error("Missing arguments for option --addPomToTsv. Please specify <pomFileName> <licenses.stub.tsv> <currentVersion> or use the option --help for further information");
+                logger.error("Missing arguments for option --addPomToTsv. Please specify <pomFileName> <licenses.stub.tsv> <currentVersion> or use the option --help for further information.");
             String pomFN = args[1];
             String spreadSheetFN = args[2];
             String currentVersion = args[3];
@@ -51,7 +51,7 @@ public class LicenseUtil {
             licensingList.writeToSpreadsheet(spreadSheetFN);
         }else if(args[0].equals("--writeLicense3rdParty")){
             if(args.length<4)
-                logger.error("Missing arguments for option --writeLicense3rdParty. Please provide <licenses.enhanced.tsv> <processModule> and <currentVersion> or use the option --help for further information");
+                logger.error("Missing arguments for option --writeLicense3rdParty. Please provide <licenses.enhanced.tsv> <processModule> and <currentVersion> or use the option --help for further information.");
             String spreadSheetFN = args[1];
             String processModule = args[2];
             String currentVersion = args[3];
@@ -69,9 +69,9 @@ public class LicenseUtil {
                 Utils.writeEffectivePom(new File(args[1]), (new File("effective-pom.xml")).getAbsolutePath());
         }else if(args[0].equals("--processProjectsInFolder")){
             if(args.length<4)
-                logger.error("Missing arguments for option --processProjectsInFolder. Please provide <superDirectory> <licenses.stub.tsv> and <currentVersion> or use the option --help for further information");
+                logger.error("Missing arguments for option --processProjectsInFolder. Please provide <superDirectory> <licenses.stub.tsv> and <currentVersion> or use the option --help for further information.");
             File directory = new File(args[1]);
-            String licenseStubFN = args[2];
+            String spreadSheetFN = args[2];
             String currentVersion = args[3];
 
             File[] subdirs = directory.listFiles((FileFilter) DirectoryFileFilter.DIRECTORY);
@@ -86,13 +86,25 @@ public class LicenseUtil {
 
                 MavenProject project = Utils.readPom(pom);
                 LicensingList licensingList = new LicensingList();
-                File f = new File(licenseStubFN);
+                File f = new File(spreadSheetFN);
                 if (f.exists() && !f.isDirectory()) {
-                    licensingList.readFromSpreadsheet(licenseStubFN, currentVersion);
+                    licensingList.readFromSpreadsheet(spreadSheetFN, currentVersion);
                 }
                 licensingList.addMavenProject(project, currentVersion);
-                licensingList.writeToSpreadsheet(licenseStubFN);
+                licensingList.writeToSpreadsheet(spreadSheetFN);
             }
+        }else if(args[0].equals("--purgeTsv")){
+            if(args.length<3)
+                logger.error("Missing arguments for option --purgeTsv. Please provide <spreadSheetIN.tsv>, <spreadSheetOUT.tsv> and <currentVersion> or use the option --help for further information.");
+            String spreadSheetIN = args[1];
+            String spreadSheetOUT = args[2];
+            String currentVersion = args[3];
+
+            LicensingList licensingList = new LicensingList();
+            licensingList.readFromSpreadsheet(spreadSheetIN, currentVersion);
+            licensingList.purge(currentVersion);
+            licensingList.writeToSpreadsheet(spreadSheetOUT);
+
         }else if(args[0].equals("--help")){
             logger.info(
                     "\nusage: maven-license-util <option> [parameters...]\n"
@@ -119,7 +131,13 @@ public class LicenseUtil {
                             "\t<project>\t\tIf you just want to have the LICENSE-3RD-PARTY file of a certain project, use the maven artifactId of this one.\n" +
                             "\t\t\t\t\t\"ALL\" creates the LICENSE-3RD-PARTY files for all projects appearing in the <tsvFile>.\n" +
                             "\t<currentReleaseVersion>\t\tOnly the libraries which have the <currentReleaseVersion> or string \"KEEP\" in the <project> column are collected. \n" +
-                            "\t\t\t\t\t\t\t\t\"KEEP\" can be used, if you have added a library manually to the list."
+                            "\t\t\t\t\t\t\t\t\"KEEP\" can be used, if you have added a library manually to the list." +
+                            "\n" +
+                            "--purgeTsv <spreadSheetIN.tsv> <spreadSheetOUT.tsv> <currentReleaseVersion>\t\t\n" +
+                            "\t\tDeletes all entries, which do not link the library via <currentReleaseVersion> to a project, except entries marked with \"KEEP\".\n" +
+                            "\t<spreadSheetIN.tsv>\t\tThe input tsv file with licensing information\n" +
+                            "\t<spreadSheetOUT.tsv>\tThe purged output tsv\n" +
+                            "\t<currentReleaseVersion>\tThe entries, which should stay in the table, should be linked via this version in the project columns."
 
             );
         }else{

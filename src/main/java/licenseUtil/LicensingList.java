@@ -43,7 +43,7 @@ public class LicensingList extends ArrayList<LicensingObject> {
     static final String forceAddingLibraryKeyword = "KEEP";
 
     public void readFromSpreadsheet(String spreadsheetFN, String currentVersion) throws IOException {
-        logger.info("read spreadsheet from \"" + spreadsheetFN + "\"...");
+        logger.info("read spreadsheet from \"" + spreadsheetFN + "\"");
         InputStreamReader inputStreamReader = null;
         try {
             inputStreamReader = new InputStreamReader(new FileInputStream(spreadsheetFN), "UTF-8");
@@ -62,7 +62,7 @@ public class LicensingList extends ArrayList<LicensingObject> {
     }
 
     public void writeToSpreadsheet(String spreadsheetFN) throws IOException {
-        logger.info("write spreadsheet to \"" + spreadsheetFN + "\"...");
+        logger.info("write spreadsheet to \"" + spreadsheetFN + "\"");
         FileWriter fileWriter = null;
         CSVPrinter csvFilePrinter = null;
 
@@ -173,7 +173,7 @@ public class LicensingList extends ArrayList<LicensingObject> {
 
 
     public void addMavenProject(MavenProject project, String version) {
-        logger.debug("add pom content to current list...");
+        logger.debug("add pom content to current list");
         List<Dependency> dependencies = project.getDependencies();
 
         for (Dependency dependency : dependencies) {
@@ -196,6 +196,17 @@ public class LicensingList extends ArrayList<LicensingObject> {
             result.addAll(licensingObject.getNonFixedHeaders());
         }
         return result;
+    }
+
+    public void purge(String version){
+        logger.info("purge licensing list: just keep elements with version=\""+version+"\" or labeled with \""+forceAddingLibraryKeyword+"\"");
+        Iterator<LicensingObject> i = this.iterator();
+        while (i.hasNext()) {
+            LicensingObject licensingObject = i.next(); // must be called before you can call i.remove()
+            if(licensingObject.purgedEmpty(version.toUpperCase())){
+                i.remove();
+            }
+        }
     }
 
     @Override

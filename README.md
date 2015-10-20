@@ -54,6 +54,11 @@ and helps you to create LICENSE-3RD-PARTY files.
 					"ALL" creates the LICENSE-3RD-PARTY files for all projects appearing in the <tsvFile>.
 	<currentReleaseVersion>		Only the libraries which have the <currentReleaseVersion> or string "KEEP" in the <project> column are collected. 
 								"KEEP" can be used, if you have added a library manually to the list.
+--purgeTsv <spreadSheetIN.tsv> <spreadSheetOUT.tsv> <currentReleaseVersion>		
+		Deletes all entries, which do not link the library via <currentReleaseVersion> to a project, except entries marked with "KEEP".
+	<spreadSheetIN.tsv>		The input tsv file with licensing information
+	<spreadSheetOUT.tsv>	The purged output tsv
+	<currentReleaseVersion>	The entries, which should stay in the table, should be linked via this version in the project columns.
 ```
 
 ## License

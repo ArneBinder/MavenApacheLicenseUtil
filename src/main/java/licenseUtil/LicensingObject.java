@@ -154,8 +154,19 @@ public class LicensingObject extends HashMap<String, String> {
         }else{
             return null;
         }
+    }
 
-
+    public boolean purgedEmpty(String version){
+        Boolean result = true;
+        for(String key: getNonFixedHeaders()){
+            String value = get(key).toUpperCase();
+            if(value.equals(version) || value.equals(LicensingList.forceAddingLibraryKeyword)){
+                result = false;
+            }else{
+                this.remove(key);
+            }
+        }
+        return result;
     }
 
     @Override
