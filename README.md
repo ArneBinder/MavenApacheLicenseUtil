@@ -24,7 +24,7 @@ and helps you to create LICENSE-3RD-PARTY files.
 3. Create the LICENSE-3RD-PARTY files by
 	- `maven-apache-license-util --writeLicense3rdParty <licenses.enhanced.tsv> ALL <currentReleaseVersion>` 
 	
-	This will take only the libraries which have the `<currentReleaseVersion>` (or "KEEP") at the project columns
+	This will take only the libraries which have the `<currentReleaseVersion>` (or `KEEP`) at the project columns
 
 ##Usage
 
