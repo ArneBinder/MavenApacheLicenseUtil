@@ -76,7 +76,7 @@ public class LicensingList extends ArrayList<LicensingObject> {
             csvFilePrinter = new CSVPrinter(fileWriter, csvFileFormat);
 
             ArrayList<String> headers = new ArrayList<String>();
-            headers.addAll(Utils.ColumnHeader.headerValues());
+            headers.addAll(LicensingObject.ColumnHeader.headerValues());
             headers.addAll(getNonFixedHeaders());
             //Create CSV file header
             csvFilePrinter.printRecord(headers);
@@ -109,13 +109,13 @@ public class LicensingList extends ArrayList<LicensingObject> {
 
             if(licensingObject.containsKey(moduleName)){
                 HashSet<String> licenseElement;
-                String licenseKey = licensingObject.get(Utils.ColumnHeader.LICENSE.value());
+                String licenseKey = licensingObject.get(LicensingObject.ColumnHeader.LICENSE.value());
                 if(!licenseList.containsKey(licenseKey)){
                     licenseElement = new HashSet<String>();
                 }else {
                     licenseElement = licenseList.get(licenseKey);
                 }
-                String libString = licensingObject.get(Utils.ColumnHeader.BUNDLE.value());
+                String libString = licensingObject.get(LicensingObject.ColumnHeader.BUNDLE.value());
                 if(libString==null){
                     libString = "";
                 }else{
@@ -123,8 +123,8 @@ public class LicensingList extends ArrayList<LicensingObject> {
                 }
 
                 if(libString.trim().equals("") || !aggregateByBundle){
-                    libString += licensingObject.get(Utils.ColumnHeader.ARTIFACT_ID.value());
-                    String version = licensingObject.get(Utils.ColumnHeader.VERSION.value());
+                    libString += licensingObject.get(LicensingObject.ColumnHeader.ARTIFACT_ID.value());
+                    String version = licensingObject.get(LicensingObject.ColumnHeader.VERSION.value());
                     if(version!=null){
                         if(version.startsWith("'"))
                             version = version.substring(1, version.length());
@@ -133,9 +133,9 @@ public class LicensingList extends ArrayList<LicensingObject> {
                         libString +=":"+version;
                     }
                 }
-                if(licensingObject.containsKey(Utils.ColumnHeader.COPYRIGHT_INFORMATION.value())){
+                if(licensingObject.containsKey(LicensingObject.ColumnHeader.COPYRIGHT_INFORMATION.value())){
 
-                    libString += ", Copyright "+licensingObject.get(Utils.ColumnHeader.COPYRIGHT_INFORMATION.value());
+                    libString += ", Copyright "+licensingObject.get(LicensingObject.ColumnHeader.COPYRIGHT_INFORMATION.value());
                 }
                 //if(!libStrings.contains(libString)) {
                 licenseElement.add(libString);

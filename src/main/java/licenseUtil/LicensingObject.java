@@ -28,27 +28,57 @@ import java.util.*;
  */
 public class LicensingObject extends HashMap<String, String> {
 
+    public enum ColumnHeader {
+        ARTIFACT_ID("artefactId"),
+        GROUP_ID("groupId"),
+        VERSION("version"),
+        BUNDLE("bundle"),
+        LICENSE("license"),
+        COPYRIGHT_INFORMATION("copyRightInformation");
+
+        private final String headerValue;
+
+        ColumnHeader(String headerValue) {
+            this.headerValue = headerValue;
+        }
+
+        public String value() {
+            return this.headerValue;
+        }
+        public static ArrayList<String> headerValues(){
+            ArrayList<String> result = new ArrayList<String>();
+            for(ColumnHeader header: ColumnHeader.class.getEnumConstants()){
+                result.add(header.value());
+            }
+            return result;
+        }
+        @Override
+        public String toString(){
+            return this.headerValue;
+        }
+    }
+
     static final char textMarker = '"';
     private final static Set<String> MARKED_AS_TEXT = Collections.unmodifiableSet(
-            new HashSet<>(Arrays.asList(Utils.ColumnHeader.VERSION.value())));
+            new HashSet<>(Arrays.asList(ColumnHeader.VERSION.value())));
 
     final Logger logger = LoggerFactory.getLogger(LicensingObject.class);
-    static final HashSet<String> keyHeaders = new HashSet<String>(Arrays.asList(Utils.ColumnHeader.ARTIFACT_ID.value(), Utils.ColumnHeader.GROUP_ID.value(), Utils.ColumnHeader.VERSION.value()));
+    static final HashSet<String> keyHeaders = new HashSet<String>(Arrays.asList(ColumnHeader.ARTIFACT_ID.value(), ColumnHeader.GROUP_ID.value(), ColumnHeader.VERSION.value()));
 
     LicensingObject(Dependency dependency, String includingProject, String version) {
         super();
-        put(Utils.ColumnHeader.ARTIFACT_ID.value(), dependency.getArtifactId());
-        put(Utils.ColumnHeader.GROUP_ID.value(), dependency.getGroupId());
-        put(Utils.ColumnHeader.VERSION.value(), dependency.getVersion());
+        put(ColumnHeader.ARTIFACT_ID.value(), dependency.getArtifactId());
+        put(ColumnHeader.GROUP_ID.value(), dependency.getGroupId());
+        put(ColumnHeader.VERSION.value(), dependency.getVersion());
         put(includingProject, version);
         clean();
     }
 
     LicensingObject(Plugin plugin, String includingProject, String version) {
         super();
-        put(Utils.ColumnHeader.ARTIFACT_ID.value(), plugin.getArtifactId());
-        put(Utils.ColumnHeader.GROUP_ID.value(), plugin.getGroupId());
-        put(Utils.ColumnHeader.VERSION.value(), plugin.getVersion());
+        put(ColumnHeader.ARTIFACT_ID.value(), plugin.getArtifactId());
+        put(ColumnHeader.GROUP_ID.value(), plugin.getGroupId());
+        put(ColumnHeader.VERSION.value(), plugin.getVersion());
         put(includingProject, version);
         clean();
     }
@@ -91,24 +121,24 @@ public class LicensingObject extends HashMap<String, String> {
         if (!(aThat instanceof LicensingObject)) return false;
         LicensingObject that = (LicensingObject) aThat;
         boolean result = false;
-        /*if((this.get(Utils.ColumnHeader.ARTIFACT_ID.value()) != null) && (this.get(Utils.ColumnHeader.ARTIFACT_ID.value()).equals("common"))
-                //&&(this.get(Utils.ColumnHeader.GROUP_ID.value()) == null) && (this.get(Utils.ColumnHeader.GROUP_ID.value()).equals("eu.freme"))
-                //&&(that.get(Utils.ColumnHeader.ARTIFACT_ID.value()) != null) && (that.get(Utils.ColumnHeader.ARTIFACT_ID.value()).equals("common"))
-                &&(that.get(Utils.ColumnHeader.GROUP_ID.value()) != null) && (that.get(Utils.ColumnHeader.GROUP_ID.value()).equals("eu.freme"))
+        /*if((this.get(ColumnHeader.ARTIFACT_ID.value()) != null) && (this.get(ColumnHeader.ARTIFACT_ID.value()).equals("common"))
+                //&&(this.get(ColumnHeader.GROUP_ID.value()) == null) && (this.get(ColumnHeader.GROUP_ID.value()).equals("eu.freme"))
+                //&&(that.get(ColumnHeader.ARTIFACT_ID.value()) != null) && (that.get(ColumnHeader.ARTIFACT_ID.value()).equals("common"))
+                &&(that.get(ColumnHeader.GROUP_ID.value()) != null) && (that.get(ColumnHeader.GROUP_ID.value()).equals("eu.freme"))
                 ){
             System.out.println();
         }*/
 
-        result = ((this.get(Utils.ColumnHeader.ARTIFACT_ID.value()) == null || that.get(Utils.ColumnHeader.ARTIFACT_ID.value()) == null || this.get(Utils.ColumnHeader.ARTIFACT_ID.value()).equals(that.get(Utils.ColumnHeader.ARTIFACT_ID.value()))) &&
-                (this.get(Utils.ColumnHeader.GROUP_ID.value()) == null || that.get(Utils.ColumnHeader.GROUP_ID.value()) == null || this.get(Utils.ColumnHeader.GROUP_ID.value()).equals(that.get(Utils.ColumnHeader.GROUP_ID.value()))) &&
-                (this.get(Utils.ColumnHeader.VERSION.value()) == null || that.get(Utils.ColumnHeader.VERSION.value()) == null || this.get(Utils.ColumnHeader.VERSION.value()).equals(that.get(Utils.ColumnHeader.VERSION.value()))));
+        result = ((this.get(ColumnHeader.ARTIFACT_ID.value()) == null || that.get(ColumnHeader.ARTIFACT_ID.value()) == null || this.get(ColumnHeader.ARTIFACT_ID.value()).equals(that.get(ColumnHeader.ARTIFACT_ID.value()))) &&
+                (this.get(ColumnHeader.GROUP_ID.value()) == null || that.get(ColumnHeader.GROUP_ID.value()) == null || this.get(ColumnHeader.GROUP_ID.value()).equals(that.get(ColumnHeader.GROUP_ID.value()))) &&
+                (this.get(ColumnHeader.VERSION.value()) == null || that.get(ColumnHeader.VERSION.value()) == null || this.get(ColumnHeader.VERSION.value()).equals(that.get(ColumnHeader.VERSION.value()))));
         return result;
     }
 
     public int hashCode() {
-        return get(Utils.ColumnHeader.ARTIFACT_ID.value()).hashCode() *
-                get(Utils.ColumnHeader.GROUP_ID.value()).hashCode() *
-                get(Utils.ColumnHeader.VERSION.value()).hashCode();
+        return get(ColumnHeader.ARTIFACT_ID.value()).hashCode() *
+                get(ColumnHeader.GROUP_ID.value()).hashCode() *
+                get(ColumnHeader.VERSION.value()).hashCode();
     }
 
     public void update(LicensingObject licensingObject) {
@@ -126,7 +156,7 @@ public class LicensingObject extends HashMap<String, String> {
     public HashSet<String> getNonFixedHeaders() {
         HashSet<String> result = new HashSet<String>();
         result.addAll(keySet());
-        result.removeAll(new HashSet<String>(Utils.ColumnHeader.headerValues()));
+        result.removeAll(new HashSet<String>(ColumnHeader.headerValues()));
         return result;
     }
 

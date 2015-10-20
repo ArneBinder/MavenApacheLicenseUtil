@@ -36,35 +36,7 @@ public class Utils {
 
     static final Logger logger = LoggerFactory.getLogger(Utils.class);
 
-    public enum ColumnHeader {
-        ARTIFACT_ID("artefactId"),
-        GROUP_ID("groupId"),
-        VERSION("version"),
-        BUNDLE("bundle"),
-        LICENSE("license"),
-        COPYRIGHT_INFORMATION("copyRightInformation");
 
-        private final String headerValue;
-
-        ColumnHeader(String headerValue) {
-            this.headerValue = headerValue;
-        }
-
-        public String value() {
-            return this.headerValue;
-        }
-        public static ArrayList<String> headerValues(){
-            ArrayList<String> result = new ArrayList<String>();
-            for(ColumnHeader header: ColumnHeader.class.getEnumConstants()){
-                result.add(header.value());
-            }
-            return result;
-        }
-        @Override
-        public String toString(){
-            return this.headerValue;
-        }
-    }
 
     public static MavenProject readPom(File pomfile) {
         logger.info("read pom file from \""+pomfile.getPath()+"\"...");
