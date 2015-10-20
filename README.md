@@ -17,11 +17,14 @@ and helps you to create LICENSE-3RD-PARTY files.
 
 	NOTE: This will overwrite the old `<licenses.enhanced.tsv>`. 
 2. Enhance the licenses.stub.tsv by yourself:
-   	- Especially fill the "license" column according to the filenames of the license templates in resources/templates (APACHE2, BSD, CDDL, EPLV1, GPLV2. GPLV3, H2, JSON, LGPLV3, MIT).
-   	- Furthermore, fill the column "bundle" for better readability and "copyRightInformation", if this information is available.
+   	- Especially fill the "license" column according to the filenames of the license templates in resources/templates (APACHE2, BSD, CDDL, EPLV1, GPLV2, GPLV3, H2, JSON, LGPLV3, MIT, SLICKBSD, UNLICENSED).
+   	- Furthermore, fill the column "bundle" and "libraryName" for better readability and "copyRightInformation", if this information is available.
+   	- Add projects which does not use maven manually, if needed. Write "KEEP" at the position of the libraries of these models (instead of <currentReleaseVersion> in the auto generated columns) to avoid the need of updating these fields manually, when you want to release the next time.
   
 3. Create the LICENSE-3RD-PARTY files by
-	- `maven-apache-license-util --writeLicense3rdParty <licenses.enhanced.tsv> ALL`
+	- `maven-apache-license-util --writeLicense3rdParty <licenses.enhanced.tsv> ALL <currentReleaseVersion>` 
+	
+	This will take only the libraries which have the <currentReleaseVersion> (or "KEEP") at the project columns
 
 ##Usage
 
@@ -47,8 +50,10 @@ and helps you to create LICENSE-3RD-PARTY files.
 
 --writeLicense3rdParty <tsvFile> (ALL|<project>)	Use the information of the <tsvFile> and generate LICENSE-3RD-PARTY files via templates from the resources/templates folder.
 	<tsvFile>		The enhanced (by you) tsv table stub
-	<project>		If you just want to have the LICENSE-3RD-PARTY file of a certain project, use the maven artifactId.
+	<project>		If you just want to have the LICENSE-3RD-PARTY file of a certain project, use the maven artifactId of this one.
 					"ALL" creates the LICENSE-3RD-PARTY files for all projects appearing in the <tsvFile>.
+	<currentReleaseVersion>		Only the libraries which have the <currentReleaseVersion> or string "KEEP" in the <project> column are collected. 
+								"KEEP" can be used, if you have added a library manually to the list.
 ```
 
 ## License
