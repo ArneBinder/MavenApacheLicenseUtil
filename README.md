@@ -29,7 +29,7 @@ and helps you to create LICENSE-3RD-PARTY files.
 
 ##Options
 ```
---processProjectsInFolder 
+--processProjectsInFolder <superDirectory> <tsvFile> <currentReleaseVersion>	
 	<superDirectory>		The directory containing the project directories.
 	<tsvFile>				The analyzed pom information is written to this file. If it exists already, the content is merged.
 	<currentReleaseVersion>	This value will be written into the project columns of the tsv if the project uses the library specified by the current row
@@ -37,11 +37,10 @@ and helps you to create LICENSE-3RD-PARTY files.
 --buildEffectivePom <MavenProjectDirectory>			Generates an effective-pom file ("effective-pom.xml") in the current folder.
 	<MavenProjectDirectory>		the maven project directory containing the pom file
 
---addPomToTsv <pomFile> <tsvFile> [<tsvOutput>]		Analyzes a maven pom file and generates a table stub, 
+--addPomToTsv <pomFile> <tsvFile>					Analyzes a maven pom file and generates a table stub, 
 													which contains each referenced (as dependency or plugin) library of the project.
 													You should use an EFFECTIVE-POM to get all information.
-													Dependencies with scope "test" are not considered.
-													
+													Dependencies with scope "test" are not considered.							
 	<pomFile>		the pom file embedding the 3rd-party libraries 
 	<tsvFile>		The analyzed pom information is written to this file. If it exists already, the content is merged.
 	<currentReleaseVersion>		will be written into the project columns if the project uses the library specified by the current row

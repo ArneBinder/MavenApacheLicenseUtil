@@ -15,6 +15,7 @@
  */
 package licenseUtil;
 
+import com.google.common.base.Strings;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
@@ -34,7 +35,9 @@ public class LicensingObject extends HashMap<String, String> {
         VERSION("version"),
         BUNDLE("bundle"),
         LICENSE("license"),
-        COPYRIGHT_INFORMATION("copyRightInformation");
+        COPYRIGHT_INFORMATION("copyRightInformation"),
+        LIBRARY_NAME("libraryName"),
+        DO_NOT_DELETE("doNotDelete");
 
         private final String headerValue;
 
@@ -46,7 +49,7 @@ public class LicensingObject extends HashMap<String, String> {
             return this.headerValue;
         }
         public static ArrayList<String> headerValues(){
-            ArrayList<String> result = new ArrayList<String>();
+            ArrayList<String> result = new ArrayList<>();
             for(ColumnHeader header: ColumnHeader.class.getEnumConstants()){
                 result.add(header.value());
             }
@@ -63,7 +66,7 @@ public class LicensingObject extends HashMap<String, String> {
             new HashSet<>(Arrays.asList(ColumnHeader.VERSION.value())));
 
     final Logger logger = LoggerFactory.getLogger(LicensingObject.class);
-    static final HashSet<String> keyHeaders = new HashSet<String>(Arrays.asList(ColumnHeader.ARTIFACT_ID.value(), ColumnHeader.GROUP_ID.value(), ColumnHeader.VERSION.value()));
+    static final HashSet<String> keyHeaders = new HashSet<>(Arrays.asList(ColumnHeader.ARTIFACT_ID.value(), ColumnHeader.GROUP_ID.value(), ColumnHeader.VERSION.value()));
 
     LicensingObject(Dependency dependency, String includingProject, String version) {
         super();
@@ -83,7 +86,7 @@ public class LicensingObject extends HashMap<String, String> {
         clean();
     }
 
-    LicensingObject(CSVRecord record) {
+    LicensingObject(CSVRecord record, String version) {
         super();
         Map<String, String> recordMap = record.toMap();
         for (String key : recordMap.keySet()) {
@@ -97,10 +100,17 @@ public class LicensingObject extends HashMap<String, String> {
                     put(key, current);
             }
         }
+        if(containsKey(ColumnHeader.DO_NOT_DELETE.value())){
+            for(String key: getNonFixedHeaders()){
+                if(!Strings.isNullOrEmpty(get(key))){
+                    put(key, version);
+                }
+            }
+        }
     }
 
     public ArrayList<String> getRecord(ArrayList<String> headers) {
-        ArrayList<String> result = new ArrayList<String>();
+        ArrayList<String> result = new ArrayList<>();
         for (String key : headers) {
             String value = get(key);
             if (value != null)
@@ -113,6 +123,40 @@ public class LicensingObject extends HashMap<String, String> {
             }
         }
         return result;
+    }
+
+    public String getStringForModule(String moduleName, Boolean aggregateByBundle){
+        if(containsKey(moduleName)){
+
+            String libString = get(LicensingObject.ColumnHeader.BUNDLE.value());
+            if(libString==null){
+                libString = "";
+            }else{
+                libString += " - ";
+            }
+
+            if(libString.trim().equals("") || !aggregateByBundle){
+                libString += get(LicensingObject.ColumnHeader.ARTIFACT_ID.value());
+                String version = get(LicensingObject.ColumnHeader.VERSION.value());
+                if(version!=null){
+                    if(version.startsWith("'"))
+                        version = version.substring(1, version.length());
+                    if(version.endsWith("'"))
+                        version = version.substring(0, version.length()-1);
+                    libString +=":"+version;
+                }
+            }
+            if(containsKey(LicensingObject.ColumnHeader.COPYRIGHT_INFORMATION.value())){
+
+                libString += ", Copyright "+get(LicensingObject.ColumnHeader.COPYRIGHT_INFORMATION.value());
+            }
+            
+            return libString;
+        }else{
+            return null;
+        }
+
+
     }
 
     @Override
@@ -154,9 +198,9 @@ public class LicensingObject extends HashMap<String, String> {
     }
 
     public HashSet<String> getNonFixedHeaders() {
-        HashSet<String> result = new HashSet<String>();
+        HashSet<String> result = new HashSet<>();
         result.addAll(keySet());
-        result.removeAll(new HashSet<String>(ColumnHeader.headerValues()));
+        result.removeAll(new HashSet<>(ColumnHeader.headerValues()));
         return result;
     }
 

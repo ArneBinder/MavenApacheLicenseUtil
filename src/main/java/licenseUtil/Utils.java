@@ -56,7 +56,11 @@ public class Utils {
 
     public static void writeEffectivePom(File projectDirectory, String fullEffectivePomFilename){
         MavenCli cli = new MavenCli();
-        cli.doMain(new String[]{"org.apache.maven.plugins:maven-help-plugin:2.2:effective-pom", "-Doutput="+fullEffectivePomFilename},projectDirectory.getAbsolutePath(), System.out, System.out);
+        logger.info("Write effective-pom to \""+fullEffectivePomFilename+"\"");
+        cli.doMain(new String[]{"org.apache.maven.plugins:maven-help-plugin:2.2:effective-pom", "-Doutput=" + fullEffectivePomFilename}, projectDirectory.getAbsolutePath(), new PrintStream(new OutputStream(){
+            public void write(int b) {
+                //NO-OP
+            }}), System.err);
     }
 
     public static void write(String content, String filename){

@@ -34,36 +34,49 @@ public class LicenseUtil {
         if(args.length==0){
             logger.error("Missing parameters. Use --help to get a list of the possible options.");
         }else if(args[0].equals("--addPomToTsv")){
-            MavenProject project = Utils.readPom(new File(args[1]));
+            if(args.length<4)
+                logger.error("Missing arguments for option --addPomToTsv. Please specify <pomFileName> <licenses.stub.tsv> <currentVersion> or use the option --help for further information");
+            String pomFN = args[1];
+            String spreadSheetFN = args[2];
+            String currentVersion = args[3];
+
+            MavenProject project = Utils.readPom(new File(pomFN));
             LicensingList licensingList = new LicensingList();
-            File f = new File(args[2]);
+            File f = new File(spreadSheetFN);
             if (f.exists() && !f.isDirectory()) {
-                licensingList.readFromSpreadsheet(args[2]);
+                licensingList.readFromSpreadsheet(spreadSheetFN, currentVersion);
             }
-            String projectVersion = args[3];
-            licensingList.addMavenProject(project, projectVersion);
-            licensingList.writeToSpreadsheet(args[2]);
+
+            licensingList.addMavenProject(project, currentVersion);
+            licensingList.writeToSpreadsheet(spreadSheetFN);
         }else if(args[0].equals("--writeLicense3rdParty")){
+            if(args.length<4)
+                logger.error("Missing arguments for option --writeLicense3rdParty. Please provide <licenses.enhanced.tsv> <processModule> and <currentVersion> or use the option --help for further information");
+            String spreadSheetFN = args[1];
+            String processModule = args[2];
+            String currentVersion = args[3];
+
             LicensingList licensingList = new LicensingList();
-            licensingList.readFromSpreadsheet(args[1]);
-            if(args[2].equals("ALL")){
+            licensingList.readFromSpreadsheet(spreadSheetFN, currentVersion);
+            if(processModule.equals("ALL")){
                 for(String module: licensingList.getNonFixedHeaders()){
                     Utils.write(licensingList.getRepoLicensesForModule(module), "LICENSE-3RD-PARTY."+module);
                 }
             }else {
-                Utils.write(licensingList.getRepoLicensesForModule(args[2]), "LICENSE-3RD-PARTY."+args[2]);
+                Utils.write(licensingList.getRepoLicensesForModule(processModule), "LICENSE-3RD-PARTY."+processModule);
             }
         }else if(args[0].equals("--buildEffectivePom")){
                 Utils.writeEffectivePom(new File(args[1]), (new File("effective-pom.xml")).getAbsolutePath());
         }else if(args[0].equals("--processProjectsInFolder")){
+            if(args.length<4)
+                logger.error("Missing arguments for option --processProjectsInFolder. Please provide <superDirectory> <licenses.stub.tsv> and <currentVersion> or use the option --help for further information");
             File directory = new File(args[1]);
-            File[] subdirs = directory.listFiles((FileFilter) DirectoryFileFilter.DIRECTORY);
-
             String licenseStubFN = args[2];
+            String currentVersion = args[3];
 
-            String projectVersion = args[3];
+            File[] subdirs = directory.listFiles((FileFilter) DirectoryFileFilter.DIRECTORY);
             for (File dir : subdirs) {
-                logger.info("process: " + dir.getName());
+                logger.info("process module: " + dir.getName());
                 logger.info("update local repository");
                 Utils.updateRepository(dir.getPath());
                 logger.info("build effective-pom");
@@ -75,9 +88,9 @@ public class LicenseUtil {
                 LicensingList licensingList = new LicensingList();
                 File f = new File(licenseStubFN);
                 if (f.exists() && !f.isDirectory()) {
-                    licensingList.readFromSpreadsheet(licenseStubFN);
+                    licensingList.readFromSpreadsheet(licenseStubFN, currentVersion);
                 }
-                licensingList.addMavenProject(project, projectVersion);
+                licensingList.addMavenProject(project, currentVersion);
                 licensingList.writeToSpreadsheet(licenseStubFN);
             }
         }else if(args[0].equals("--help")){
