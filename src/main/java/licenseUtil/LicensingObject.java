@@ -36,8 +36,7 @@ public class LicensingObject extends HashMap<String, String> {
         BUNDLE("bundle"),
         LICENSE("license"),
         COPYRIGHT_INFORMATION("copyRightInformation"),
-        LIBRARY_NAME("libraryName"),
-        DO_NOT_DELETE("doNotDelete");
+        LIBRARY_NAME("libraryName");
 
         private final String headerValue;
 
@@ -86,7 +85,7 @@ public class LicensingObject extends HashMap<String, String> {
         clean();
     }
 
-    LicensingObject(CSVRecord record, String version) {
+    LicensingObject(CSVRecord record) {
         super();
         Map<String, String> recordMap = record.toMap();
         for (String key : recordMap.keySet()) {
@@ -98,13 +97,6 @@ public class LicensingObject extends HashMap<String, String> {
                     put(key, current.substring(1,current.length()-1));
                 } else
                     put(key, current);
-            }
-        }
-        if(containsKey(ColumnHeader.DO_NOT_DELETE.value())){
-            for(String key: getNonFixedHeaders()){
-                if(!Strings.isNullOrEmpty(get(key))){
-                    put(key, version);
-                }
             }
         }
     }
@@ -128,7 +120,7 @@ public class LicensingObject extends HashMap<String, String> {
     public String getStringForModule(String moduleName, Boolean aggregateByBundle){
         if(containsKey(moduleName)){
 
-            String libString = get(LicensingObject.ColumnHeader.BUNDLE.value());
+            String libString = get(ColumnHeader.BUNDLE.value());
             if(libString==null){
                 libString = "";
             }else{
@@ -136,8 +128,11 @@ public class LicensingObject extends HashMap<String, String> {
             }
 
             if(libString.trim().equals("") || !aggregateByBundle){
-                libString += get(LicensingObject.ColumnHeader.ARTIFACT_ID.value());
-                String version = get(LicensingObject.ColumnHeader.VERSION.value());
+                libString += get(ColumnHeader.ARTIFACT_ID.value());
+                /*String libName = get(ColumnHeader.LIBRARY_NAME.value());
+                if(libName!=null)
+                    libString += "("+libName+")";*/
+                String version = get(ColumnHeader.VERSION.value());
                 if(version!=null){
                     if(version.startsWith("'"))
                         version = version.substring(1, version.length());
@@ -146,11 +141,11 @@ public class LicensingObject extends HashMap<String, String> {
                     libString +=":"+version;
                 }
             }
-            if(containsKey(LicensingObject.ColumnHeader.COPYRIGHT_INFORMATION.value())){
+            if(containsKey(ColumnHeader.COPYRIGHT_INFORMATION.value())) {
 
-                libString += ", Copyright "+get(LicensingObject.ColumnHeader.COPYRIGHT_INFORMATION.value());
+                libString += ", Copyright "+get(ColumnHeader.COPYRIGHT_INFORMATION.value());
             }
-            
+
             return libString;
         }else{
             return null;

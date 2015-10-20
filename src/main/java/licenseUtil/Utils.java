@@ -64,7 +64,7 @@ public class Utils {
     }
 
     public static void write(String content, String filename){
-        logger.info("write to file \""+filename+"\"...");
+        logger.info("write to file \""+filename+"\"");
         Writer out = null;
         try {
             out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filename), "UTF-8"));

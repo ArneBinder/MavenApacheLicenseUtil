@@ -60,10 +60,10 @@ public class LicenseUtil {
             licensingList.readFromSpreadsheet(spreadSheetFN, currentVersion);
             if(processModule.toUpperCase().equals("ALL")){
                 for(String module: licensingList.getNonFixedHeaders()){
-                    Utils.write(licensingList.getRepoLicensesForModule(module), "LICENSE-3RD-PARTY."+module);
+                    Utils.write(licensingList.getRepoLicensesForModule(module, currentVersion), "LICENSE-3RD-PARTY."+module);
                 }
             }else {
-                Utils.write(licensingList.getRepoLicensesForModule(processModule), "LICENSE-3RD-PARTY."+processModule);
+                Utils.write(licensingList.getRepoLicensesForModule(processModule, currentVersion), "LICENSE-3RD-PARTY."+processModule);
             }
         }else if(args[0].equals("--buildEffectivePom")){
                 Utils.writeEffectivePom(new File(args[1]), (new File("effective-pom.xml")).getAbsolutePath());

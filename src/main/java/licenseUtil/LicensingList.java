@@ -40,6 +40,7 @@ public class LicensingList extends ArrayList<LicensingObject> {
     static final CharSequence libraryListPlaceholder = "#librarylist";
     static final String licenseTextDirectory = "src/main/resources/templates/";
     static final Boolean aggregateByBundle = false;
+    static final String forceAddingLibraryKeyword = "KEEP";
 
     public void readFromSpreadsheet(String spreadsheetFN, String currentVersion) throws IOException {
         logger.info("read spreadsheet from \"" + spreadsheetFN + "\"...");
@@ -56,7 +57,7 @@ public class LicensingList extends ArrayList<LicensingObject> {
                 CSVFormat.DEFAULT.withHeader().withDelimiter(columnDelimiter));
 
         for (CSVRecord record : parser) {
-            add(new LicensingObject(record, currentVersion));
+            add(new LicensingObject(record));
         }
     }
 
@@ -100,7 +101,7 @@ public class LicensingList extends ArrayList<LicensingObject> {
         }
     }
 
-    public String getRepoLicensesForModule(String moduleName) throws IOException{
+    public String getRepoLicensesForModule(String moduleName, String version) throws IOException{
         String result ="3rd party license information for \""+moduleName+"\"\n";
         HashMap<String, HashSet<String>> licenseList = new HashMap<>();
         for(LicensingObject licensingObject: this){
@@ -108,19 +109,22 @@ public class LicensingList extends ArrayList<LicensingObject> {
             licensingObject.clean();
 
             if(licensingObject.containsKey(moduleName)){
-                HashSet<String> licenseElement;
-                String licenseKey = licensingObject.get(LicensingObject.ColumnHeader.LICENSE.value());
-                if(!licenseList.containsKey(licenseKey)){
-                    licenseElement = new HashSet<>();
-                }else {
-                    licenseElement = licenseList.get(licenseKey);
-                }
+                String versionString = licensingObject.get(moduleName).toUpperCase();
+                if(versionString.equals(version.toUpperCase()) || versionString.equals(forceAddingLibraryKeyword.toUpperCase())) {
+                    HashSet<String> licenseElement;
+                    String licenseKey = licensingObject.get(LicensingObject.ColumnHeader.LICENSE.value());
+                    if (!licenseList.containsKey(licenseKey)) {
+                        licenseElement = new HashSet<>();
+                    } else {
+                        licenseElement = licenseList.get(licenseKey);
+                    }
 
-                //if(!libStrings.contains(libString)) {
-                licenseElement.add(licensingObject.getStringForModule(moduleName, aggregateByBundle));
-                //  libStrings.add(libString);
-                //}
-                licenseList.put(licenseKey,licenseElement);
+                    //if(!libStrings.contains(libString)) {
+                    licenseElement.add(licensingObject.getStringForModule(moduleName, aggregateByBundle));
+                    //  libStrings.add(libString);
+                    //}
+                    licenseList.put(licenseKey, licenseElement);
+                }
             }
         }
         ArrayList<String> sortedLicenseNames = new ArrayList<>(licenseList.keySet());
