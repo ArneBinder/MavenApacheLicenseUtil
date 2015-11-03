@@ -45,7 +45,7 @@ public class Utils {
         MavenXpp3Reader mavenreader = new MavenXpp3Reader();
         try {
             reader = new FileReader(pomfile);
-            model = mavenreader.read(reader);
+            model = mavenreader.read(reader, false);
             model.setPomFile(pomfile);
         } catch (Exception ex) {
             ex.printStackTrace();
