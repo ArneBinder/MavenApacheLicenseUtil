@@ -44,10 +44,11 @@ public class Utils {
         Model model = null;
         FileReader reader;
         MavenXpp3Reader mavenreader = new MavenXpp3Reader();
-        //try {
-            reader = new FileReader(pomfile);
-            model = mavenreader.read(reader, false);
-            model.setPomFile(pomfile);
+
+        reader = new FileReader(pomfile);
+        model = mavenreader.read(reader, false);
+        model.setPomFile(pomfile);
+        reader.close();
 
         MavenProject project = new MavenProject(model);
         return project;

@@ -18,6 +18,7 @@ package licenseUtil;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.eclipse.jgit.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +35,7 @@ public class LicenseUtil {
 
     static final String LICENSE_3RD_PARTY_FN = "LICENSE-3RD-PARTY";
     static final String EFFECTIVE_POM_FN = "effective-pom.xml";
+    static final String POM_FN = "pom.xml";
 
     public static void main(String[] args) throws IOException {
         if(args.length==0){
@@ -72,7 +74,7 @@ public class LicenseUtil {
                 File targetDir = new File(args[4]);
                 File[] subdirs = targetDir.listFiles((FileFilter) DirectoryFileFilter.DIRECTORY);
                 for(File subdir: subdirs){
-                    String pomFN = subdir.getPath()+File.separator+EFFECTIVE_POM_FN;
+                    String pomFN = subdir.getPath()+File.separator+POM_FN;
                     MavenProject mavenProject;
                     try {
                         mavenProject = Utils.readPom(new File(pomFN));
@@ -119,6 +121,7 @@ public class LicenseUtil {
                     logger.warn("Could not read from pom file: \"" + pom.getPath() + "\" because of "+e.getMessage());
                     continue;
                 }
+                FileUtils.delete(pom);
                 LicensingList licensingList = new LicensingList();
                 File f = new File(spreadSheetFN);
                 if (f.exists() && !f.isDirectory()) {
