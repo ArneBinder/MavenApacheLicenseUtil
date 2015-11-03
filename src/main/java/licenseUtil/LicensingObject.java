@@ -131,8 +131,11 @@ public class LicensingObject extends HashMap<String, String> {
                 String libName = get(ColumnHeader.LIBRARY_NAME.value());
                 if(libName!=null)
                     libString += ": "+libName;
-                libString += " - ";
+                //libString += " - ";
             }
+
+            if(!libString.equals(""))
+                libString += " - ";
 
             if(libString.trim().equals("") || !aggregateByBundle){
                 libString += get(ColumnHeader.ARTIFACT_ID.value());
