@@ -48,12 +48,15 @@ and helps you to create LICENSE-3RD-PARTY files.
 	<tsvFile>		The analyzed pom information is written to this file. If it exists already, the content is merged.
 	<currentReleaseVersion>		will be written into the project columns if the project uses the library specified by the current row
 
---writeLicense3rdParty <tsvFile> (ALL|<project>)	Use the information of the <tsvFile> and generate LICENSE-3RD-PARTY files via templates from the resources/templates folder.
+--writeLicense3rdParty <tsvFile> (ALL|<project>) \[<targetDir>\]	Use the information of the <tsvFile> and generate LICENSE-3RD-PARTY files via templates from the resources/templates folder.
 	<tsvFile>		The enhanced (by you) tsv table stub
 	<project>		If you just want to have the LICENSE-3RD-PARTY file of a certain project, use the maven artifactId of this one.
 					"ALL" creates the LICENSE-3RD-PARTY files for all projects appearing in the <tsvFile>.
 	<currentReleaseVersion>		Only the libraries which have the <currentReleaseVersion> or string "KEEP" in the <project> column are collected. 
 								"KEEP" can be used, if you have added a library manually to the list.
+	<targetDir>		This folder is searched for maven projects with the same artefactID as in the tsv column headers (projects). 
+					If found, the LICENSE-3RD-PARTY file is written into the containing folder. 
+					Furthermore, the local repo is updated and the changes in the LICENSE-3RD-PARTY file are committed and pushed, if it is open access.
 --purgeTsv <spreadSheetIN.tsv> <spreadSheetOUT.tsv> <currentReleaseVersion>		
 		Deletes all entries, which do not link the library via <currentReleaseVersion> to a project, except entries marked with "KEEP".
 	<spreadSheetIN.tsv>		The input tsv file with licensing information

@@ -17,10 +17,12 @@ package licenseUtil;
 
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.util.HashMap;
 
 
 /**
@@ -29,6 +31,9 @@ import java.io.*;
 public class LicenseUtil {
 
     static final Logger logger = LoggerFactory.getLogger(LicenseUtil.class);
+
+    static final String LICENSE_3RD_PARTY_FN = "LICENSE-3RD-PARTY";
+    static final String EFFECTIVE_POM_FN = "effective-pom.xml";
 
     public static void main(String[] args) throws IOException {
         if(args.length==0){
@@ -40,7 +45,12 @@ public class LicenseUtil {
             String spreadSheetFN = args[2];
             String currentVersion = args[3];
 
-            MavenProject project = Utils.readPom(new File(pomFN));
+            MavenProject project = null;
+            try {
+                project = Utils.readPom(new File(pomFN));
+            } catch (XmlPullParserException e) {
+                logger.error("Could not parse pom file: \""+pomFN+"\"");
+            }
             LicensingList licensingList = new LicensingList();
             File f = new File(spreadSheetFN);
             if (f.exists() && !f.isDirectory()) {
@@ -51,22 +61,40 @@ public class LicenseUtil {
             licensingList.writeToSpreadsheet(spreadSheetFN);
         }else if(args[0].equals("--writeLicense3rdParty")){
             if(args.length<4)
-                logger.error("Missing arguments for option --writeLicense3rdParty. Please provide <licenses.enhanced.tsv> <processModule> and <currentVersion> or use the option --help for further information.");
+                logger.error("Missing arguments for option --writeLicense3rdParty. Please provide <licenses.enhanced.tsv> <processModule> <currentVersion> [and <targetDir>] or use the option --help for further information.");
             String spreadSheetFN = args[1];
             String processModule = args[2];
             String currentVersion = args[3];
+
+
+            HashMap<String, String> targetDirs = new HashMap<>();
+            if(args.length > 4){
+                File targetDir = new File(args[4]);
+                File[] subdirs = targetDir.listFiles((FileFilter) DirectoryFileFilter.DIRECTORY);
+                for(File subdir: subdirs){
+                    String pomFN = subdir.getPath()+File.separator+EFFECTIVE_POM_FN;
+                    MavenProject mavenProject;
+                    try {
+                        mavenProject = Utils.readPom(new File(pomFN));
+                    } catch (Exception e) {
+                        logger.warn("Could not read from pom file: \""+pomFN+"\" because of "+e.getMessage());
+                        continue;
+                    }
+                    targetDirs.put(mavenProject.getModel().getArtifactId(), subdir.getAbsolutePath());
+                }
+            }
 
             LicensingList licensingList = new LicensingList();
             licensingList.readFromSpreadsheet(spreadSheetFN, currentVersion);
             if(processModule.toUpperCase().equals("ALL")){
                 for(String module: licensingList.getNonFixedHeaders()){
-                    Utils.write(licensingList.getRepoLicensesForModule(module, currentVersion), "LICENSE-3RD-PARTY."+module);
+                    writeLicense3rdPartyFile(module,licensingList,currentVersion,targetDirs.get(module));
                 }
             }else {
-                Utils.write(licensingList.getRepoLicensesForModule(processModule, currentVersion), "LICENSE-3RD-PARTY."+processModule);
+                writeLicense3rdPartyFile(processModule,licensingList,currentVersion,targetDirs.get(processModule));
             }
         }else if(args[0].equals("--buildEffectivePom")){
-                Utils.writeEffectivePom(new File(args[1]), (new File("effective-pom.xml")).getAbsolutePath());
+                Utils.writeEffectivePom(new File(args[1]), (new File(EFFECTIVE_POM_FN)).getAbsolutePath());
         }else if(args[0].equals("--processProjectsInFolder")){
             if(args.length<4)
                 logger.error("Missing arguments for option --processProjectsInFolder. Please provide <superDirectory> <licenses.stub.tsv> and <currentVersion> or use the option --help for further information.");
@@ -80,11 +108,17 @@ public class LicenseUtil {
                 logger.info("update local repository");
                 Utils.updateRepository(dir.getPath());
                 logger.info("build effective-pom");
-                File pom = new File(dir.getPath()+"/effective-pom.xml");
+                File pom = new File(dir.getPath()+File.separator+EFFECTIVE_POM_FN);
                 Utils.writeEffectivePom(new File(dir.getPath()), pom.getAbsolutePath());
                 logger.info("add pom content to tsv");
 
-                MavenProject project = Utils.readPom(pom);
+                MavenProject project = null;
+                try {
+                    project = Utils.readPom(pom);
+                } catch (Exception e) {
+                    logger.warn("Could not read from pom file: \"" + pom.getPath() + "\" because of "+e.getMessage());
+                    continue;
+                }
                 LicensingList licensingList = new LicensingList();
                 File f = new File(spreadSheetFN);
                 if (f.exists() && !f.isDirectory()) {
@@ -126,12 +160,15 @@ public class LicenseUtil {
                             "\t<tsvFile>\t\tThe analyzed pom information is written to this file. If it exists already, the content is merged.\n" +
                             "\t<currentReleaseVersion>\t\twill be written into the project columns if the project uses the library specified by the current row\n" +
                             "\n" +
-                            "--writeLicense3rdParty <tsvFile> (ALL|<project>)\tUse the information of the <tsvFile> and generate LICENSE-3RD-PARTY files via templates from the resources/templates folder.\n" +
+                            "--writeLicense3rdParty <tsvFile> (ALL|<project>) [<targetDir>]\tUse the information of the <tsvFile> and generate LICENSE-3RD-PARTY files via templates from the resources/templates folder.\n" +
                             "\t<tsvFile>\t\tThe enhanced (by you) tsv table stub\n" +
                             "\t<project>\t\tIf you just want to have the LICENSE-3RD-PARTY file of a certain project, use the maven artifactId of this one.\n" +
                             "\t\t\t\t\t\"ALL\" creates the LICENSE-3RD-PARTY files for all projects appearing in the <tsvFile>.\n" +
                             "\t<currentReleaseVersion>\t\tOnly the libraries which have the <currentReleaseVersion> or string \"KEEP\" in the <project> column are collected. \n" +
-                            "\t\t\t\t\t\t\t\t\"KEEP\" can be used, if you have added a library manually to the list." +
+                            "\t\t\t\t\t\t\t\t\"KEEP\" can be used, if you have added a library manually to the list.\n" +
+                            "\t<targetDir>\t\tThis folder is searched for maven projects with the same artefactID as in the tsv column headers (projects).\n" +
+                            "\t\t\t\t\tIf found, the LICENSE-3RD-PARTY file is written into the containing folder.\n"+
+                            "\t\t\t\t\tFurthermore, the local repo is updated and the changes in the LICENSE-3RD-PARTY file are committed and pushed, if it is open access." +
                             "\n" +
                             "--purgeTsv <spreadSheetIN.tsv> <spreadSheetOUT.tsv> <currentReleaseVersion>\t\t\n" +
                             "\t\tDeletes all entries, which do not link the library via <currentReleaseVersion> to a project, except entries marked with \"KEEP\".\n" +
@@ -145,5 +182,20 @@ public class LicenseUtil {
         }
     }
 
+
+    public static void writeLicense3rdPartyFile(String module, LicensingList licensingList, String currentVersion, String targetDir) throws IOException {
+        if(targetDir!=null){
+            File new3rdPartyLicenseFile = new File(targetDir+File.separator + LICENSE_3RD_PARTY_FN);
+            Utils.updateRepository(targetDir);
+            boolean exists = new3rdPartyLicenseFile.exists();
+            Utils.write(licensingList.getRepoLicensesForModule(module, currentVersion), new3rdPartyLicenseFile);
+            if(!exists) {
+                Utils.addToRepository(targetDir, LICENSE_3RD_PARTY_FN);
+                Utils.commitAndPushRepository(targetDir, "added file: "+ LICENSE_3RD_PARTY_FN);
+            }else
+                Utils.commitAndPushRepository(targetDir, "updated file: "+ LICENSE_3RD_PARTY_FN);
+        }else
+            Utils.write(licensingList.getRepoLicensesForModule(module, currentVersion), LICENSE_3RD_PARTY_FN +"."+module);
+    }
 
 }
