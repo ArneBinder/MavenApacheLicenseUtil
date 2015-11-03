@@ -23,7 +23,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.List;
 
 
 /**
@@ -36,6 +39,7 @@ public class LicenseUtil {
     static final String LICENSE_3RD_PARTY_FN = "LICENSE-3RD-PARTY";
     static final String EFFECTIVE_POM_FN = "effective-pom.xml";
     static final String POM_FN = "pom.xml";
+    static final String README_PATH = "README.md";
 
     public static void main(String[] args) throws IOException {
         if(args.length==0){
@@ -143,45 +147,15 @@ public class LicenseUtil {
             licensingList.writeToSpreadsheet(spreadSheetOUT);
 
         }else if(args[0].equals("--help")){
-            logger.info(
-                    "\nusage: maven-license-util <option> [parameters...]\n"
-                            + "\n"
-                            + "possible options:\n"
-                            + "--processProjectsInFolder <superDirectory> <tsvFile> <currentReleaseVersion>\t\n" +
-                            "\t<superDirectory>\t\tThe directory containing the project directories.\n" +
-                            "\t<tsvFile>\t\t\t\tThe analyzed pom information is written to this file. If it exists already, the content is merged.\n" +
-                            "\t<currentReleaseVersion>\tThis value will be written into the project columns of the tsv if the project uses the library specified by the current row\n" +
-                            "\t\n" +
-                            "--buildEffectivePom <MavenProjectDirectory>\t\t\tGenerates an effective-pom file (\"effective-pom.xml\") in the current folder.\n" +
-                            "\t<MavenProjectDirectory>\t\tthe maven project directory containing the pom file\n" +
-                            "\n" +
-                            "--addPomToTsv <pomFile> <tsvFile>\t\t\t\t\tAnalyzes a maven pom file and generates a table stub, \n" +
-                            "\t\t\t\t\t\t\t\t\t\t\t\t\twhich contains each referenced (as dependency or plugin) library of the project.\n" +
-                            "\t\t\t\t\t\t\t\t\t\t\t\t\tYou should use an EFFECTIVE-POM to get all information.\n" +
-                            "\t\t\t\t\t\t\t\t\t\t\t\t\tDependencies with scope \"test\" are not considered.\t\t\t\t\t\t\t\n" +
-                            "\t<pomFile>\t\tthe pom file embedding the 3rd-party libraries \n" +
-                            "\t<tsvFile>\t\tThe analyzed pom information is written to this file. If it exists already, the content is merged.\n" +
-                            "\t<currentReleaseVersion>\t\twill be written into the project columns if the project uses the library specified by the current row\n" +
-                            "\n" +
-                            "--writeLicense3rdParty <tsvFile> (ALL|<project>) [<targetDir>]\tUse the information of the <tsvFile> and generate LICENSE-3RD-PARTY files via templates from the resources/templates folder.\n" +
-                            "\t<tsvFile>\t\tThe enhanced (by you) tsv table stub\n" +
-                            "\t<project>\t\tIf you just want to have the LICENSE-3RD-PARTY file of a certain project, use the maven artifactId of this one.\n" +
-                            "\t\t\t\t\t\"ALL\" creates the LICENSE-3RD-PARTY files for all projects appearing in the <tsvFile>.\n" +
-                            "\t<currentReleaseVersion>\t\tOnly the libraries which have the <currentReleaseVersion> or string \"KEEP\" in the <project> column are collected. \n" +
-                            "\t\t\t\t\t\t\t\t\"KEEP\" can be used, if you have added a library manually to the list.\n" +
-                            "\t<targetDir>\t\tThis folder is searched for maven projects with the same artefactID as in the tsv column headers (projects).\n" +
-                            "\t\t\t\t\tIf found, the LICENSE-3RD-PARTY file is written into the containing folder.\n"+
-                            "\t\t\t\t\tFurthermore, the local repo is updated and the changes in the LICENSE-3RD-PARTY file are committed and pushed, if it is open access." +
-                            "\n" +
-                            "--purgeTsv <spreadSheetIN.tsv> <spreadSheetOUT.tsv> <currentReleaseVersion>\t\t\n" +
-                            "\t\tDeletes all entries, which do not link the library via <currentReleaseVersion> to a project, except entries marked with \"KEEP\".\n" +
-                            "\t<spreadSheetIN.tsv>\t\tThe input tsv file with licensing information\n" +
-                            "\t<spreadSheetOUT.tsv>\tThe purged output tsv\n" +
-                            "\t<currentReleaseVersion>\tThe entries, which should stay in the table, should be linked via this version in the project columns."
-
-            );
+            InputStream in =  LicenseUtil.class.getClassLoader().getResourceAsStream(README_PATH);
+            Utils utils = new Utils();
+            BufferedReader reader =new BufferedReader(new InputStreamReader(in));
+            String line;
+            while((line = reader.readLine()) !=null){
+                System.out.println(line);
+            }
         }else{
-            logger.error("Unknown parameter: "+args[0]+". Use --help to get a list of the possible options.");
+            logger.error("Unknown parameter: " + args[0] + ". Use --help to get a list of the possible options.");
         }
     }
 

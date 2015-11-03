@@ -26,6 +26,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.net.URISyntaxException;
 import java.util.*;
 
 /**
@@ -38,7 +39,7 @@ public class LicensingList extends ArrayList<LicensingObject> {
     static final char columnDelimiter = '\t';
     static final String excludedScope = "test";
     static final CharSequence libraryListPlaceholder = "#librarylist";
-    static final String licenseTextDirectory = "src/main/resources/templates/";
+    static final String licenseTextDirectory = "/templates/";
     static final Boolean aggregateByBundle = false;
     static final String forceAddingLibraryKeyword = "KEEP";
 
@@ -131,15 +132,11 @@ public class LicensingList extends ArrayList<LicensingObject> {
         sortedLicenseNames.remove(null);
         Collections.sort(sortedLicenseNames);
         for(String key: sortedLicenseNames){
-            File f = new File(licenseTextDirectory+key);
-            if (f.exists() && !f.isDirectory()) {
-                InputStreamReader inputStreamReader = null;
-                try {
-                    inputStreamReader = new InputStreamReader(new FileInputStream(f), "UTF-8");
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                }
-                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+            InputStream inputStream = null;
+            String fn = licenseTextDirectory + key;
+            inputStream = getClass().getResourceAsStream(fn);
+            if(inputStream!=null){
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
                 String line = null;
                 result += "\n-----------------------------------------------------------------------------\n\n";
                 while ((line = bufferedReader.readLine()) != null) {
@@ -157,8 +154,9 @@ public class LicensingList extends ArrayList<LicensingObject> {
                 }
                 bufferedReader.close();
             }else{
+                logger.warn("COULD NOT FIND LICENSE TEMPLATE FILE: "+fn);
                 result += "\n-----------------------------------------------------------------------------\n";
-                result += "\nCOULD NOT FIND LICENSE TEMPLATE FILE \""+f.getPath()+"\"\n";
+                result += "\nCOULD NOT FIND LICENSE TEMPLATE FILE \""+fn+"\"\n";
                 result += "\n-----------------------------------------------------------------------------\n";
                 result += "applies to:\n";
                 ArrayList<String> sortedLibraryInfos = new ArrayList<>(licenseList.get(key));
