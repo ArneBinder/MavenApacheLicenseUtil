@@ -1,23 +1,25 @@
-package licenseUtil.aether;
-
 /*******************************************************************************
- * Copyright (c) 2010-2011 Sonatype, Inc.
+ * Copyright (c) 2010, 2011 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- *   http://www.eclipse.org/legal/epl-v10.html
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
+package org.eclipse.aether.examples.util;
+
+import org.eclipse.aether.AbstractRepositoryListener;
+import org.eclipse.aether.RepositoryEvent;
 
 import java.io.PrintStream;
-
-import org.sonatype.aether.AbstractRepositoryListener;
-import org.sonatype.aether.RepositoryEvent;
 
 /**
  * A simplistic repository listener that logs events to the console.
  */
 public class ConsoleRepositoryListener
-        extends AbstractRepositoryListener
+    extends AbstractRepositoryListener
 {
 
     private PrintStream out;
@@ -45,7 +47,7 @@ public class ConsoleRepositoryListener
     public void artifactDescriptorInvalid( RepositoryEvent event )
     {
         out.println( "Invalid artifact descriptor for " + event.getArtifact() + ": "
-                + event.getException().getMessage() );
+            + event.getException().getMessage() );
     }
 
     public void artifactDescriptorMissing( RepositoryEvent event )

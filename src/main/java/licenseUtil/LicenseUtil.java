@@ -137,8 +137,16 @@ public class LicenseUtil {
             MavenProject project = null;
             try {
                 project = Utils.readPom(new File(pomFN));
+
             } catch (XmlPullParserException e) {
                 logger.error("Could not parse pom file: \""+pomFN+"\"");
+            }
+
+
+            try {
+                Utils.test();
+            } catch (org.eclipse.aether.resolution.DependencyResolutionException e) {
+                e.printStackTrace();
             }
             //try {
                 //SortedMap<String, MavenProject> licenses = Utils.loadProjectDependencies(project);

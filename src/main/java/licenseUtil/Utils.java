@@ -17,12 +17,23 @@ package licenseUtil;
 
 
 
-import licenseUtil.aether.Booter;
 import org.apache.maven.cli.MavenCli;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.collection.CollectRequest;
+import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.graph.DependencyFilter;
+import org.eclipse.aether.resolution.ArtifactResult;
+import org.eclipse.aether.resolution.DependencyRequest;
+import org.eclipse.aether.resolution.DependencyResolutionException;
+import org.eclipse.aether.util.artifact.JavaScopes;
+import org.eclipse.aether.util.filter.DependencyFilterUtils;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.*;
 import org.eclipse.jgit.lib.Repository;
@@ -32,19 +43,6 @@ import org.slf4j.LoggerFactory;
 
 
 import java.util.List;
-
-import org.sonatype.aether.RepositorySystem;
-import org.sonatype.aether.RepositorySystemSession;
-import org.sonatype.aether.artifact.Artifact;
-import org.sonatype.aether.collection.CollectRequest;
-import org.sonatype.aether.graph.Dependency;
-import org.sonatype.aether.graph.DependencyFilter;
-import org.sonatype.aether.resolution.ArtifactResult;
-import org.sonatype.aether.resolution.DependencyRequest;
-import org.sonatype.aether.resolution.DependencyResolutionException;
-import org.sonatype.aether.util.artifact.DefaultArtifact;
-import org.sonatype.aether.util.artifact.JavaScopes;
-import org.sonatype.aether.util.filter.DependencyFilterUtils;
 
 
 import java.io.*;
@@ -182,9 +180,25 @@ public class Utils {
 
     }
 
-    public void test() throws DependencyResolutionException, org.eclipse.aether.resolution.DependencyResolutionException {
+    /*public static void test2(MavenProject project) throws DependencyResolutionException {
+        File local = new File("/tmp/local-repository");
+        Collection<RemoteRepository> remotes = new LinkedList<>();
+        for( org.apache.maven.model.Repository repository: project.getModel().getRepositories()){
+            remotes.add(new RemoteRepository(repository.getId(), "default", repository.getUrl()));
+        }
 
-        System.out.println( "------------------------------------------------------------" );
+        DefaultArtifact root = new DefaultArtifact(project.getGroupId(),project.getArtifactId(),"",project.getPackaging(),project.getVersion());
+
+        Collection<Artifact> deps = new Aether(remotes, local).resolve(root,
+                "runtime"
+        );
+        System.out.println("asd");
+
+    }*/
+
+    public static void test() throws DependencyResolutionException, org.eclipse.aether.resolution.DependencyResolutionException {
+
+        /*System.out.println( "------------------------------------------------------------" );
         //System.out.println( ResolveTransitiveDependencies.class.getSimpleName() );
 
         RepositorySystem system = Booter.newRepositorySystem();
@@ -207,7 +221,7 @@ public class Utils {
         for ( ArtifactResult artifactResult : artifactResults )
         {
             System.out.println( artifactResult.getArtifact() + " resolved to " + artifactResult.getArtifact().getFile() );
-        }
+        }*/
 
     }
 

@@ -1,14 +1,19 @@
-package licenseUtil.aether;
-
-
-
 /*******************************************************************************
- * Copyright (c) 2010-2011 Sonatype, Inc.
+ * Copyright (c) 2010, 2013 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
- *   http://www.eclipse.org/legal/epl-v10.html
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *    Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
+package org.eclipse.aether.examples.util;
+
+import org.eclipse.aether.transfer.AbstractTransferListener;
+import org.eclipse.aether.transfer.MetadataNotFoundException;
+import org.eclipse.aether.transfer.TransferEvent;
+import org.eclipse.aether.transfer.TransferResource;
 
 import java.io.PrintStream;
 import java.text.DecimalFormat;
@@ -17,15 +22,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.sonatype.aether.transfer.AbstractTransferListener;
-import org.sonatype.aether.transfer.TransferEvent;
-import org.sonatype.aether.transfer.TransferResource;
-
 /**
  * A simplistic transfer listener that logs uploads/downloads to the console.
  */
 public class ConsoleTransferListener
-        extends AbstractTransferListener
+    extends AbstractTransferListener
 {
 
     private PrintStream out;
@@ -123,13 +124,14 @@ public class ConsoleTransferListener
             long duration = System.currentTimeMillis() - resource.getTransferStartTime();
             if ( duration > 0 )
             {
+                long bytes = contentLength - resource.getResumeOffset();
                 DecimalFormat format = new DecimalFormat( "0.0", new DecimalFormatSymbols( Locale.ENGLISH ) );
-                double kbPerSec = ( contentLength / 1024.0 ) / ( duration / 1000.0 );
+                double kbPerSec = ( bytes / 1024.0 ) / ( duration / 1000.0 );
                 throughput = " at " + format.format( kbPerSec ) + " KB/sec";
             }
 
             out.println( type + ": " + resource.getRepositoryUrl() + resource.getResourceName() + " (" + len
-                    + throughput + ")" );
+                + throughput + ")" );
         }
     }
 
@@ -138,7 +140,10 @@ public class ConsoleTransferListener
     {
         transferCompleted( event );
 
-        event.getException().printStackTrace( out );
+        if ( !( event.getException() instanceof MetadataNotFoundException ) )
+        {
+            event.getException().printStackTrace( out );
+        }
     }
 
     private void transferCompleted( TransferEvent event )
