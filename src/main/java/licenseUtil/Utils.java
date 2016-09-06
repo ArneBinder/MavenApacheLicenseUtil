@@ -15,10 +15,14 @@
  */
 package licenseUtil;
 
+
+
 import org.apache.maven.cli.MavenCli;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.ProjectBuildingException;
+import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.*;
@@ -27,8 +31,26 @@ import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+
+import java.util.List;
+
+import org.sonatype.aether.RepositorySystem;
+import org.sonatype.aether.RepositorySystemSession;
+import org.sonatype.aether.artifact.Artifact;
+import org.sonatype.aether.collection.CollectRequest;
+import org.sonatype.aether.graph.Dependency;
+import org.sonatype.aether.graph.DependencyFilter;
+import org.sonatype.aether.resolution.ArtifactResult;
+import org.sonatype.aether.resolution.DependencyRequest;
+import org.sonatype.aether.resolution.DependencyResolutionException;
+import org.sonatype.aether.util.artifact.DefaultArtifact;
+import org.sonatype.aether.util.artifact.JavaScopes;
+import org.sonatype.aether.util.filter.DependencyFilterUtils;
+
+
 import java.io.*;
-import java.util.ArrayList;
+import java.util.*;
+import java.util.regex.Pattern;
 
 /**
  * Created by Arne Binder (arne.b.binder@gmail.com) on 10.09.2015.
@@ -162,4 +184,112 @@ public class Utils {
         }
 
     }
+
+    public void test() throws DependencyResolutionException, org.eclipse.aether.resolution.DependencyResolutionException {
+
+        System.out.println( "------------------------------------------------------------" );
+        //System.out.println( ResolveTransitiveDependencies.class.getSimpleName() );
+
+        RepositorySystem system = Booter.newRepositorySystem();
+
+        RepositorySystemSession session = Booter.newRepositorySystemSession( system );
+
+        Artifact artifact = new DefaultArtifact( "org.eclipse.aether:aether-impl:1.0.0.v20140518" );
+
+        DependencyFilter classpathFlter = DependencyFilterUtils.classpathFilter( JavaScopes.COMPILE );
+
+        CollectRequest collectRequest = new CollectRequest();
+        collectRequest.setRoot( new Dependency( artifact, JavaScopes.COMPILE ) );
+        collectRequest.setRepositories( Booter.newRepositories( system, session ) );
+
+        DependencyRequest dependencyRequest = new DependencyRequest( collectRequest, classpathFlter );
+
+        List<ArtifactResult> artifactResults =
+                system.resolveDependencies( session, dependencyRequest ).getArtifactResults();
+
+        for ( ArtifactResult artifactResult : artifactResults )
+        {
+            System.out.println( artifactResult.getArtifact() + " resolved to " + artifactResult.getArtifact().getFile() );
+        }
+
+    }
+
+    /*public static SortedMap<String, MavenProject> loadProjectDependencies(MavenProject project
+                                                                   //,ArtifactRepository localRepository,
+                                                                   //,List<ArtifactRepository> remoteRepositories
+    ) throws ProjectBuildingException {
+
+        MavenProjectBuilder mavenProjectBuilder = new DefaultMavenProjectBuilder();
+
+        Artifact artifact = new DefaultArtifact( "org.sonatype.aether:aether-util:1.9" );
+
+        //List<ArtifactRepository> remoteRepositories =  project.getRemoteArtifactRepositories();
+
+        //ArtifactRepository localRepository = project.getArtifact().getRepository();
+
+        Set<?> depArtifacts;
+
+        //if ( configuration.isIncludeTransitiveDependencies() )
+        //{
+            // All project dependencies
+            depArtifacts = project.getArtifacts();
+        //}
+        //else
+        //{
+            // Only direct project dependencies
+        //    depArtifacts = project.getDependencyArtifacts();
+        //}
+
+//        List<String> includedScopes = configuration.getIncludedScopes();
+//        List<String> excludeScopes = configuration.getExcludedScopes();
+//
+//        boolean verbose = configuration.isVerbose();
+
+
+        SortedMap<String, MavenProject> result = new TreeMap<String, MavenProject>();
+
+        for ( Object o : depArtifacts )
+        {
+            Artifact artifact = (Artifact) o;
+
+
+            String scope = artifact.getScope();
+
+
+            //org.codehaus.plexus.logging.Logger log = getLogger();
+
+            String id = artifact.getGroupId()+":"+artifact.getArtifactId()+":"+artifact.getVersion();
+
+            MavenProject depMavenProject = null;
+
+
+                // build project
+
+                //try
+                //{
+                    //depMavenProject =
+                      //      mavenProjectBuilder.buildFromRepository( artifact, remoteRepositories, localRepository, true );
+                    //depMavenProject.getArtifact().setScope( artifact.getScope() );
+                //}
+                //catch ( ProjectBuildingException e )
+                //{
+                    //log.warn( "Unable to obtain POM for artifact : " + artifact, e );
+                //    continue;
+                //}
+
+
+
+
+            // keep the project
+            result.put( id, depMavenProject );
+        }
+        return result;
+    }*/
+
+
+
+
+
+
+
 }
