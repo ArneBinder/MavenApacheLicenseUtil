@@ -1,4 +1,4 @@
-package licenseUtil;
+package licenseUtil.aether;
 /*******************************************************************************
  * Copyright (c) 2010-2011 Sonatype, Inc.
  * All rights reserved. This program and the accompanying materials

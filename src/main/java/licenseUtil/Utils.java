@@ -17,12 +17,11 @@ package licenseUtil;
 
 
 
+import licenseUtil.aether.Booter;
 import org.apache.maven.cli.MavenCli;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuildingException;
-import org.codehaus.plexus.component.annotations.Requirement;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.*;
@@ -49,8 +48,6 @@ import org.sonatype.aether.util.filter.DependencyFilterUtils;
 
 
 import java.io.*;
-import java.util.*;
-import java.util.regex.Pattern;
 
 /**
  * Created by Arne Binder (arne.b.binder@gmail.com) on 10.09.2015.
