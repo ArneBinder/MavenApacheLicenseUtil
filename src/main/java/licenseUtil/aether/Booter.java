@@ -8,7 +8,7 @@
  * Contributors:
  *    Sonatype, Inc. - initial API and implementation
  *******************************************************************************/
-package org.eclipse.aether.examples.util;
+package licenseUtil.aether;
 
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
@@ -29,7 +29,7 @@ public class Booter
 
     public static RepositorySystem newRepositorySystem()
     {
-        return org.eclipse.aether.examples.manual.ManualRepositorySystemFactory.newRepositorySystem();
+        return ManualRepositorySystemFactory.newRepositorySystem();
         // return org.eclipse.aether.examples.guice.GuiceRepositorySystemFactory.newRepositorySystem();
         // return org.eclipse.aether.examples.sisu.SisuRepositorySystemFactory.newRepositorySystem();
         // return org.eclipse.aether.examples.plexus.PlexusRepositorySystemFactory.newRepositorySystem();
