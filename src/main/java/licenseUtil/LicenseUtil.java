@@ -111,8 +111,14 @@ public class LicenseUtil {
             File directory = new File(args[1]);
             String spreadSheetFN = args[2];
             String currentVersion = args[3];
+            LicensingList licensingList = new LicensingList();
+            File f = new File(spreadSheetFN);
+            if (f.exists() && !f.isDirectory()) {
+                licensingList.readFromSpreadsheet(spreadSheetFN, currentVersion);
+            }
+            licensingList.addAll(processProjectsInFolder(directory, spreadSheetFN, currentVersion,false));
+            licensingList.writeToSpreadsheet(spreadSheetFN);
 
-            processProjectsInFolder(directory, spreadSheetFN, currentVersion);
         }else if(args[0].equals("--purgeTsv")){
             if(args.length<3)
                 logger.error("Missing arguments for option --purgeTsv. Please provide <spreadSheetIN.tsv>, <spreadSheetOUT.tsv> and <currentVersion> or use the option --help for further information.");
@@ -168,10 +174,66 @@ public class LicenseUtil {
     }
 
 
-    public static LicensingList processProjectsInFolder(File directory, String spreadSheetFN, String currentVersion) throws IOException {
+    public static LicensingList processProjectsInFolder(File directory, String spreadSheetFN, String currentVersion, Boolean mavenProjectsOnly) throws IOException {
+
+
+        LicensingList result = new LicensingList();
         File[] subdirs = directory.listFiles((FileFilter) DirectoryFileFilter.DIRECTORY);
-        LicensingList all = new LicensingList();
-        for (File dir : subdirs) {
+        File gitDir = new File(directory.getPath()+File.separator+".git");
+        File pomFile = new File(directory.getPath()+File.separator+"pom.xml");
+
+        if(mavenProjectsOnly){
+            // check pom.xml
+            if(!pomFile.exists()){
+                return result;
+            }
+        }else{
+            // check git and update
+            if(gitDir.exists()) {
+                logger.info("update local repository");
+                Utils.updateRepository(directory.getPath());
+            }
+            for (File dir : subdirs) {
+                result.addAll(processProjectsInFolder(dir, spreadSheetFN, currentVersion, true));
+            }
+            //return result;
+        }
+        logger.info("process directory: " + directory.getName());
+
+        // check git and update
+        if(gitDir.exists()) {
+            logger.info("update local repository");
+            Utils.updateRepository(directory.getPath());
+        }
+
+        logger.info("build effective-pom");
+        File pom = new File(directory.getPath()+File.separator+EFFECTIVE_POM_FN);
+        Utils.writeEffectivePom(new File(directory.getPath()), pom.getAbsolutePath());
+        MavenProject project = null;
+        try {
+            project = Utils.readPom(pom);
+        } catch (Exception e) {
+            logger.warn("Could not read from pom file: \"" + pom.getPath() + "\" because of "+e.getMessage());
+            return result;
+        }
+        FileUtils.delete(pom);
+
+        // death first
+        for (String module : project.getModules()) {
+            File subdirectory = new File(directory + File.separator + module);
+            result.addAll(processProjectsInFolder(subdirectory, spreadSheetFN, currentVersion, true));
+        }
+
+        /*File f = new File(spreadSheetFN);
+        if (f.exists() && !f.isDirectory()) {
+            result.readFromSpreadsheet(spreadSheetFN, currentVersion);
+        }*/
+        result.addMavenProject(project, currentVersion);
+        //result.writeToSpreadsheet(spreadSheetFN);
+
+        return result;
+
+        /*for (File dir : subdirs) {
             // check if pom.xml is available
             File pomFile = new File(dir.getPath()+File.separator+"pom.xml");
             if(!pomFile.exists()){
@@ -213,7 +275,7 @@ public class LicenseUtil {
             licensingList.writeToSpreadsheet(spreadSheetFN);
             all.addAll(licensingList);
         }
-        return all;
+        return all;*/
     }
 
     public static void writeLicense3rdPartyFile(String module, LicensingList licensingList, String currentVersion, String targetDir) throws IOException {

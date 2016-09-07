@@ -260,10 +260,9 @@ public class LicensingList extends ArrayList<LicensingObject> {
                             break;
                         }
                         //Iterable<LinkSpan> links = linkExtractor.extractLinks(line);
-                        Iterator<LinkSpan> it = linkExtractor.extractLinks(line).iterator();
-                        while (it.hasNext()) {
-                            LinkSpan linkSpan = it.next();
-                            link = line.substring(linkSpan.getBeginIndex(), linkSpan.getEndIndex());
+                        for (LinkSpan linkSpan : linkExtractor.extractLinks(line)) {
+                            // get substring containing the link and prune protocol
+                            link = line.substring(linkSpan.getBeginIndex(), linkSpan.getEndIndex()).replaceFirst("^[^:]+://", "");
                             result.put(link, licenseFN);
                             foundUrl = true;
                         }
@@ -286,14 +285,24 @@ public class LicensingList extends ArrayList<LicensingObject> {
     }
 
     @Override
+    public boolean addAll(Collection<? extends LicensingObject> c) {
+        boolean result = true;
+        for(LicensingObject licensingObject: c){
+            result &= this.add(licensingObject);
+        }
+        return result;
+    }
+
+    @Override
     public boolean add(LicensingObject newLicensingObject) {
          int index = indexOf(newLicensingObject);
         if (index == -1) {
             return super.add(newLicensingObject);
         } else {
-            LicensingObject inList = get(index);
-            remove(index);
-            if (indexOf(newLicensingObject) != -1) {
+            LicensingObject inList = remove(index);
+            int newIndex = indexOf(newLicensingObject);
+            int newIndex2 = indexOf(inList);
+            if (newIndex != -1) {
                 // or throw exception?
                 logger.warn("could not add newLicensingObject:\t" + newLicensingObject.toString());
                 super.add(inList);

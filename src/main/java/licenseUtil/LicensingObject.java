@@ -85,7 +85,8 @@ public class LicensingObject extends HashMap<String, String> {
             String licenseFN = null;
             int i = 0;
             for(License license:project.getLicenses()) {
-                licenseFN = Utils.getValue(licenseUrlFileMappings, license.getUrl());
+                if(license.getUrl()!=null && licenseFN == null)
+                    licenseFN = Utils.getValue(licenseUrlFileMappings, license.getUrl().replaceFirst("^[^:]+://", ""));
                 if (i++ > 0) {
                     licenseNames += licenseSeparator;
                     licenseUrls += licenseSeparator;
@@ -224,9 +225,9 @@ public class LicensingObject extends HashMap<String, String> {
             System.out.println();
         }*/
 
-        result = ((this.get(ColumnHeader.ARTIFACT_ID.value()) == null || that.get(ColumnHeader.ARTIFACT_ID.value()) == null || this.get(ColumnHeader.ARTIFACT_ID.value()).equals(that.get(ColumnHeader.ARTIFACT_ID.value()))) &&
-                (this.get(ColumnHeader.GROUP_ID.value()) == null || that.get(ColumnHeader.GROUP_ID.value()) == null || this.get(ColumnHeader.GROUP_ID.value()).equals(that.get(ColumnHeader.GROUP_ID.value()))) &&
-                (this.get(ColumnHeader.VERSION.value()) == null || that.get(ColumnHeader.VERSION.value()) == null || this.get(ColumnHeader.VERSION.value()).equals(that.get(ColumnHeader.VERSION.value()))));
+        result = ((/*this.get(ColumnHeader.ARTIFACT_ID.value()) == null || that.get(ColumnHeader.ARTIFACT_ID.value()) == null || */this.get(ColumnHeader.ARTIFACT_ID.value()).equals(that.get(ColumnHeader.ARTIFACT_ID.value()))) &&
+                (/*this.get(ColumnHeader.GROUP_ID.value()) == null || that.get(ColumnHeader.GROUP_ID.value()) == null || */this.get(ColumnHeader.GROUP_ID.value()).equals(that.get(ColumnHeader.GROUP_ID.value()))) &&
+                (/*this.get(ColumnHeader.VERSION.value()) == null || that.get(ColumnHeader.VERSION.value()) == null || */this.get(ColumnHeader.VERSION.value()).equals(that.get(ColumnHeader.VERSION.value()))));
         return result;
     }
 
