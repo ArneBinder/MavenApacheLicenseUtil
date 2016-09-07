@@ -17,20 +17,13 @@ package licenseUtil;
 
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.eclipse.aether.resolution.ArtifactDescriptorException;
-import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.jgit.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.List;
-import java.util.SortedMap;
 
 
 /**
@@ -112,7 +105,7 @@ public class LicenseUtil {
             String spreadSheetFN = args[2];
             String currentVersion = args[3];
             LicensingList licensingList = new LicensingList();
-            licensingList.addAll(processProjectsInFolder(directory, spreadSheetFN, currentVersion,false));
+            licensingList.addAll(processProjectsInFolder(directory, currentVersion, false));
             licensingList.writeToSpreadsheet(spreadSheetFN);
 
         }else if(args[0].equals("--purgeTsv")){
@@ -129,8 +122,7 @@ public class LicenseUtil {
 
         }else if(args[0].equals("--help")){
             InputStream in =  LicenseUtil.class.getClassLoader().getResourceAsStream(README_PATH);
-            Utils utils = new Utils();
-            BufferedReader reader =new BufferedReader(new InputStreamReader(in));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(in));
             String line;
             while((line = reader.readLine()) !=null){
                 System.out.println(line);
@@ -139,44 +131,19 @@ public class LicenseUtil {
             String pomFN = args[1];
 
             LicensingList licensingList = new LicensingList();
-            /*MavenProject project = null;
-            try {
-                project = Utils.readPom(new File(pomFN));
-
-            } catch (XmlPullParserException e) {
-                logger.error("Could not parse pom file: \""+pomFN+"\"");
-            }*/
-
-            /*try {
-                Utils.testResolveArtefact(project);
-            } catch (ArtifactResolutionException e) {
-                e.printStackTrace();
-            }*/
-
-            /*try {
-                Utils.test(project);
-            } catch (ArtifactDescriptorException | XmlPullParserException | ArtifactResolutionException e) {
-                e.printStackTrace();
-            }*/
-            //try {
-                //SortedMap<String, MavenProject> licenses = Utils.loadProjectDependencies(project);
-            //} catch (ProjectBuildingException e) {
-            //   e.printStackTrace();
-            // }
-
         }else{
             logger.error("Unknown parameter: " + args[0] + ". Use --help to get a list of the possible options.");
         }
     }
 
 
-    public static LicensingList processProjectsInFolder(File directory, String spreadSheetFN, String currentVersion, Boolean mavenProjectsOnly) throws IOException {
+    public static LicensingList processProjectsInFolder(File directory, String currentVersion, Boolean mavenProjectsOnly) throws IOException {
 
         LicensingList result = new LicensingList();
-        File f = new File(spreadSheetFN);
+        /*File f = new File(spreadSheetFN);
         if (f.exists() && !f.isDirectory()) {
             result.readFromSpreadsheet(spreadSheetFN, currentVersion);
-        }
+        }*/
 
         File[] subdirs = directory.listFiles((FileFilter) DirectoryFileFilter.DIRECTORY);
         File gitDir = new File(directory.getPath()+File.separator+".git");
@@ -194,7 +161,7 @@ public class LicenseUtil {
                 Utils.updateRepository(directory.getPath());
             }
             for (File dir : subdirs) {
-                result.addAll(processProjectsInFolder(dir, spreadSheetFN, currentVersion, true));
+                result.addAll(processProjectsInFolder(dir, currentVersion, true));
             }
             //return result;
         }
@@ -221,61 +188,12 @@ public class LicenseUtil {
         // death first
         for (String module : project.getModules()) {
             File subdirectory = new File(directory + File.separator + module);
-            result.addAll(processProjectsInFolder(subdirectory, spreadSheetFN, currentVersion, true));
+            result.addAll(processProjectsInFolder(subdirectory, currentVersion, true));
         }
 
-        /*File f = new File(spreadSheetFN);
-        if (f.exists() && !f.isDirectory()) {
-            result.readFromSpreadsheet(spreadSheetFN, currentVersion);
-        }*/
         result.addMavenProject(project, currentVersion);
-        //result.writeToSpreadsheet(spreadSheetFN);
 
         return result;
-
-        /*for (File dir : subdirs) {
-            // check if pom.xml is available
-            File pomFile = new File(dir.getPath()+File.separator+"pom.xml");
-            if(!pomFile.exists()){
-                logger.debug("skip directory: "+dir.getName()+", no pom.xml available");
-                continue;
-            }
-
-            logger.info("process directory: " + dir.getName());
-            File gitDir = new File(dir.getPath()+File.separator+".git");
-            if(gitDir.exists()) {
-                logger.info("update local repository");
-                Utils.updateRepository(dir.getPath());
-            }
-
-            LicensingList licensingList = new LicensingList();
-            if(dir.isDirectory()){
-                licensingList.addAll(processProjectsInFolder(dir,spreadSheetFN,currentVersion));
-            }
-
-            logger.info("build effective-pom");
-            File pom = new File(dir.getPath()+File.separator+EFFECTIVE_POM_FN);
-            Utils.writeEffectivePom(new File(dir.getPath()), pom.getAbsolutePath());
-            logger.info("add pom content to tsv");
-
-            MavenProject project = null;
-            try {
-                project = Utils.readPom(pom);
-            } catch (Exception e) {
-                logger.warn("Could not read from pom file: \"" + pom.getPath() + "\" because of "+e.getMessage());
-                continue;
-            }
-            FileUtils.delete(pom);
-
-            File f = new File(spreadSheetFN);
-            if (f.exists() && !f.isDirectory()) {
-                licensingList.readFromSpreadsheet(spreadSheetFN, currentVersion);
-            }
-            licensingList.addMavenProject(project, currentVersion);
-            licensingList.writeToSpreadsheet(spreadSheetFN);
-            all.addAll(licensingList);
-        }
-        return all;*/
     }
 
     public static void writeLicense3rdPartyFile(String module, LicensingList licensingList, String currentVersion, String targetDir) throws IOException {
@@ -286,11 +204,14 @@ public class LicenseUtil {
             Utils.write(licensingList.getRepoLicensesForModule(module, currentVersion), new3rdPartyLicenseFile);
             if(!exists) {
                 Utils.addToRepository(targetDir, LICENSE_3RD_PARTY_FN);
-                Utils.commitAndPushRepository(targetDir, "added file: "+ LICENSE_3RD_PARTY_FN);
-            }else
-                Utils.commitAndPushRepository(targetDir, "updated file: "+ LICENSE_3RD_PARTY_FN);
-        }else
-            Utils.write(licensingList.getRepoLicensesForModule(module, currentVersion), LICENSE_3RD_PARTY_FN +"."+module);
+                //Utils.commitAndPushRepository(targetDir, "added file: "+ LICENSE_3RD_PARTY_FN);
+            }else {
+                //Utils.commitAndPushRepository(targetDir, "updated file: "+ LICENSE_3RD_PARTY_FN);
+            }
+        }else {
+            File new3rdPartyLicenseFile = new File(LICENSE_3RD_PARTY_FN + "." + module);
+            Utils.write(licensingList.getRepoLicensesForModule(module, currentVersion), new3rdPartyLicenseFile);
+        }
     }
 
 }

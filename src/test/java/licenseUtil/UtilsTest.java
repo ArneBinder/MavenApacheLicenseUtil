@@ -1,6 +1,5 @@
 package licenseUtil;
 
-import licenseUtil.Utils;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.junit.Test;
 

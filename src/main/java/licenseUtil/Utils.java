@@ -17,32 +17,29 @@ package licenseUtil;
 
 
 import licenseUtil.aether.Booter;
-import org.apache.commons.io.IOUtils;
 import org.apache.maven.cli.MavenCli;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.repository.RemoteRepository;
-import org.eclipse.aether.resolution.*;
+import org.eclipse.aether.resolution.ArtifactRequest;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
-import org.nibor.autolink.LinkExtractor;
-import org.nibor.autolink.LinkSpan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.eclipse.aether.RepositorySystem;
-import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.artifact.DefaultArtifact;
-
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Arne Binder (arne.b.binder@gmail.com) on 10.09.2015.
@@ -50,8 +47,6 @@ import java.util.*;
 public class Utils {
 
     static final Logger logger = LoggerFactory.getLogger(Utils.class);
-
-
 
     public static MavenProject readPom(File pomfile) throws IOException, XmlPullParserException {
         logger.info("read pom file from \""+pomfile.getPath()+"\"...");
@@ -76,30 +71,7 @@ public class Utils {
                 //NO-OP
             }}), System.err);
     }
-
-    public static void write(String content, String filename){
-        logger.info("write to file \""+filename+"\"");
-        Writer out = null;
-        try {
-            out = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(filename), "UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        try {
-            out.write(content);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                out.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
+    
     public static void write(String content, File file){
         logger.info("write to file \""+file.getPath()+"\"");
         Writer out = null;
@@ -177,34 +149,12 @@ public class Utils {
 
     }
 
-    /*public static void test2(MavenProject project) throws DependencyResolutionException {
-        File local = new File("/tmp/local-repository");
-        Collection<RemoteRepository> remotes = new LinkedList<>();
-        for( org.apache.maven.model.Repository repository: project.getModel().getRepositories()){
-            remotes.add(new RemoteRepository(repository.getId(), "default", repository.getUrl()));
-        }
-
-        DefaultArtifact root = new DefaultArtifact(project.getGroupId(),project.getArtifactId(),"",project.getPackaging(),project.getVersion());
-
-        Collection<Artifact> deps = new Aether(remotes, local).resolve(root,
-                "runtime"
-        );
-        System.out.println("asd");
-
-    }*/
-
-    public static MavenProject resolveArtefact(MavenProject project, Artifact artifact) throws ArtifactResolutionException, IOException, XmlPullParserException {
-
-        System.out.println( "------------------------------------------------------------" );
-        //System.out.println( ResolveArtifact.class.getSimpleName() );
-
+    public static MavenProject resolveArtifact(MavenProject project, Artifact artifact) throws ArtifactResolutionException, IOException, XmlPullParserException {
+        logger.debug( "resolve artifact " + artifact.toString() );
+        
         RepositorySystem system = Booter.newRepositorySystem();
-
         RepositorySystemSession session = Booter.newRepositorySystemSession( system );
-
-        //Artifact artifact = new DefaultArtifact(dependency.getArtifact().getGroupId(),dependency.getArtifact().getArtifactId(),"pom",dependency.getArtifact().getVersion()); //( "org.eclipse.aether:aether-impl:1.0.0.v20140518" );
-
-        //Artifact artifact = new DefaultArtifact( "org.eclipse.aether:aether-util:1.0.0.v20140518" );
+        
         ArtifactRequest artifactRequest = new ArtifactRequest();
         artifactRequest.setArtifact( artifact );
 
@@ -216,44 +166,12 @@ public class Utils {
         artifactRequest.setRepositories( remotes );
 
         ArtifactResult artifactResult = system.resolveArtifact( session, artifactRequest );
-
         artifact = artifactResult.getArtifact();
-
-        System.out.println( artifact + " resolved to  " + artifact.getFile() );
+        logger.debug( artifact + " resolved to  " + artifact.getFile() );
 
         return Utils.readPom(artifact.getFile());
     }
-
-    public static void test(MavenProject project) throws ArtifactDescriptorException, XmlPullParserException, IOException, ArtifactResolutionException {
-        System.out.println( "------------------------------------------------------------" );
-        //System.out.println( GetDirectDependencies.class.getSimpleName() );
-
-        RepositorySystem system = Booter.newRepositorySystem();
-
-        RepositorySystemSession session = Booter.newRepositorySystemSession( system );
-
-        Artifact artifact = new DefaultArtifact(project.getGroupId(),project.getArtifactId(),project.getPackaging(),project.getVersion()); //( "org.eclipse.aether:aether-impl:1.0.0.v20140518" );
-
-        ArtifactDescriptorRequest descriptorRequest = new ArtifactDescriptorRequest();
-        descriptorRequest.setArtifact( artifact );
-        List<RemoteRepository> remotes = new LinkedList<>();
-        for( org.apache.maven.model.Repository repository: project.getModel().getRepositories()){
-            remotes.add(new RemoteRepository.Builder(repository.getId(), "default", repository.getUrl()).build());
-        }
-        remotes.add(Booter.newCentralRepository());
-        descriptorRequest.setRepositories( remotes );
-
-        ArtifactDescriptorResult descriptorResult = system.readArtifactDescriptor( session, descriptorRequest );
-
-        for ( Dependency dependency : descriptorResult.getDependencies() )
-        {
-            System.out.println( dependency );
-            MavenProject dep = resolveArtefact(project, new DefaultArtifact(dependency.getArtifact().getGroupId(),dependency.getArtifact().getArtifactId(),"pom",dependency.getArtifact().getVersion()));
-            System.out.println("LICENSE: "+dep.getLicenses().toString());
-        }
-    }
-
-
+    
     static public String getValue(Map<String, String> map, String key){
         if(map.containsKey(key))
             return map.get(key);
@@ -267,84 +185,4 @@ public class Utils {
 
         return null;
     }
-
-
-    /*public static SortedMap<String, MavenProject> loadProjectDependencies(MavenProject project
-                                                                   //,ArtifactRepository localRepository,
-                                                                   //,List<ArtifactRepository> remoteRepositories
-    ) throws ProjectBuildingException {
-
-        MavenProjectBuilder mavenProjectBuilder = new DefaultMavenProjectBuilder();
-
-        Artifact artifact = new DefaultArtifact( "org.sonatype.aether:aether-util:1.9" );
-
-        //List<ArtifactRepository> remoteRepositories =  project.getRemoteArtifactRepositories();
-
-        //ArtifactRepository localRepository = project.getArtifact().getRepository();
-
-        Set<?> depArtifacts;
-
-        //if ( configuration.isIncludeTransitiveDependencies() )
-        //{
-            // All project dependencies
-            depArtifacts = project.getArtifacts();
-        //}
-        //else
-        //{
-            // Only direct project dependencies
-        //    depArtifacts = project.getDependencyArtifacts();
-        //}
-
-//        List<String> includedScopes = configuration.getIncludedScopes();
-//        List<String> excludeScopes = configuration.getExcludedScopes();
-//
-//        boolean verbose = configuration.isVerbose();
-
-
-        SortedMap<String, MavenProject> result = new TreeMap<String, MavenProject>();
-
-        for ( Object o : depArtifacts )
-        {
-            Artifact artifact = (Artifact) o;
-
-
-            String scope = artifact.getScope();
-
-
-            //org.codehaus.plexus.logging.Logger log = getLogger();
-
-            String id = artifact.getGroupId()+":"+artifact.getArtifactId()+":"+artifact.getVersion();
-
-            MavenProject depMavenProject = null;
-
-
-                // build project
-
-                //try
-                //{
-                    //depMavenProject =
-                      //      mavenProjectBuilder.buildFromRepository( artifact, remoteRepositories, localRepository, true );
-                    //depMavenProject.getArtifact().setScope( artifact.getScope() );
-                //}
-                //catch ( ProjectBuildingException e )
-                //{
-                    //log.warn( "Unable to obtain POM for artifact : " + artifact, e );
-                //    continue;
-                //}
-
-
-
-
-            // keep the project
-            result.put( id, depMavenProject );
-        }
-        return result;
-    }*/
-
-
-
-
-
-
-
 }

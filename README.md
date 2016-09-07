@@ -33,7 +33,7 @@ which are direct subfolders of `<superDirectory>`, by executing:
 	
 	This will take only the libraries which have the `<currentReleaseVersion>` (or `KEEP`) at the project columns.
 	In addition you can use the optional parameter <targetDir>. IF you do so, all direct subfolders of the <targetDir> 
-	folder are considered as maven projects and if a project with the same artefactID as in the tsv column headers (projects) 
+	folder are considered as maven projects and if a project with the same artifactID as in the tsv column headers (projects) 
 	is found, the LICENSE-3RD-PARTY file is written into the containing folder. 
 	Furthermore, the local repo is updated and the changes in the LICENSE-3RD-PARTY file are committed 
 	and pushed for these files, if no special access rights are needed.
@@ -78,7 +78,7 @@ which are direct subfolders of `<superDirectory>`, by executing:
 								or string "KEEP" in the <project> column are collected. 
 								"KEEP" can be used, if you have added a library manually to the list.
 	<targetDir>					This folder is searched for maven projects with the same 
-								artefactID as in the tsv column headers (projects). 
+								artifactID as in the tsv column headers (projects). 
 								If found, the LICENSE-3RD-PARTY file is written into the containing folder. 
 								Furthermore, the local repo is updated and the changes in 
 								the LICENSE-3RD-PARTY file are committed and pushed for these files, 

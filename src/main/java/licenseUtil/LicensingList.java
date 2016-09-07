@@ -19,7 +19,6 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
-import org.apache.commons.io.Charsets;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
@@ -34,7 +33,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -188,12 +186,12 @@ public class LicensingList extends ArrayList<LicensingObject> {
         for (Dependency dependency : dependencies) {
             if(dependency.getScope()==null || !dependency.getScope().equals(excludedScope)) {
                 LicensingObject licensingObject;
-                Artifact depArtefact = new DefaultArtifact(dependency.getGroupId(),dependency.getArtifactId(),"pom",dependency.getVersion());
+                Artifact depArtifact = new DefaultArtifact(dependency.getGroupId(),dependency.getArtifactId(),"pom",dependency.getVersion());
                 try {
-                    MavenProject depProject = Utils.resolveArtefact(project, depArtefact);
+                    MavenProject depProject = Utils.resolveArtifact(project, depArtifact);
                     licensingObject = new LicensingObject(depProject, project.getArtifactId(), version, licenseUrlMappings);
                 } catch (ArtifactResolutionException | IOException | XmlPullParserException e) {
-                    logger.error("Could not resolve Artefact; "+depArtefact.toString());
+                    logger.error("Could not resolve Artifact; "+depArtifact.toString());
                     licensingObject = new LicensingObject(dependency, project.getArtifactId(), version);
                 }
                 add(licensingObject);
@@ -204,12 +202,12 @@ public class LicensingList extends ArrayList<LicensingObject> {
         for (Plugin plugin : plugins) {
             //LicensingObject licensingObject = new LicensingObject(plugin, project.getArtifactId(), version);
             LicensingObject licensingObject;
-            Artifact depArtefact = new DefaultArtifact(plugin.getGroupId(),plugin.getArtifactId(),"pom",plugin.getVersion());
+            Artifact depArtifact = new DefaultArtifact(plugin.getGroupId(),plugin.getArtifactId(),"pom",plugin.getVersion());
             try {
-                MavenProject depProject = Utils.resolveArtefact(project, depArtefact);
+                MavenProject depProject = Utils.resolveArtifact(project, depArtifact);
                 licensingObject = new LicensingObject(depProject, project.getArtifactId(), version, licenseUrlMappings);
             } catch (ArtifactResolutionException | IOException | XmlPullParserException e) {
-                logger.error("Could not resolve Artefact; "+depArtefact.toString());
+                logger.error("Could not resolve Artifact; "+depArtifact.toString());
                 licensingObject = new LicensingObject(plugin, project.getArtifactId(), version);
             }
             add(licensingObject);

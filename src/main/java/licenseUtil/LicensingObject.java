@@ -25,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created by Arne Binder (arne.b.binder@gmail.com) on 10.09.2015.
@@ -33,7 +32,7 @@ import java.util.stream.Collectors;
 public class LicensingObject extends HashMap<String, String> {
 
     public enum ColumnHeader {
-        ARTIFACT_ID("artefactId"),
+        ARTIFACT_ID("artifactId"),
         GROUP_ID("groupId"),
         VERSION("version"),
         BUNDLE("bundle"),
@@ -70,11 +69,10 @@ public class LicensingObject extends HashMap<String, String> {
             new HashSet<>(Arrays.asList(ColumnHeader.VERSION.value())));
 
     final Logger logger = LoggerFactory.getLogger(LicensingObject.class);
-    static final HashSet<String> keyHeaders = new HashSet<>(Arrays.asList(ColumnHeader.ARTIFACT_ID.value(), ColumnHeader.GROUP_ID.value(), ColumnHeader.VERSION.value()));
+    static final HashSet<String> keyHeaders = new HashSet<>(Arrays.asList(ColumnHeader.ARTIFACT_ID.value(), ColumnHeader.GROUP_ID.value(), ColumnHeader.VERSION.value(), ColumnHeader.LICENSE_URL.value()));
 
     LicensingObject(MavenProject project, String includingProject, String version, Map<String, String> licenseUrlFileMappings) {
         super();
-        logger.info("RESOLVED");
         put(ColumnHeader.ARTIFACT_ID.value(), project.getArtifactId());
         put(ColumnHeader.GROUP_ID.value(), project.getGroupId());
         put(ColumnHeader.VERSION.value(), project.getVersion());
@@ -256,7 +254,7 @@ public class LicensingObject extends HashMap<String, String> {
         return result;
     }
 
-    private <T> T updateElement(T origElemt, T updateElement, Boolean override) {
+    private static <T> T updateElement(T origElemt, T updateElement, Boolean override) {
         if ((origElemt == null || override) && updateElement != null)
             return updateElement;
         else
