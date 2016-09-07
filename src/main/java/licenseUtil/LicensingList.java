@@ -22,6 +22,10 @@ import org.apache.commons.csv.CSVRecord;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -176,14 +180,31 @@ public class LicensingList extends ArrayList<LicensingObject> {
 
         for (Dependency dependency : dependencies) {
             if(dependency.getScope()==null || !dependency.getScope().equals(excludedScope)) {
-                LicensingObject licensingObject = new LicensingObject(dependency, project.getArtifactId(), version);
+                LicensingObject licensingObject;
+                Artifact depArtefact = new DefaultArtifact(dependency.getGroupId(),dependency.getArtifactId(),"pom",dependency.getVersion());
+                try {
+                    MavenProject depProject = Utils.resolveArtefact(project, depArtefact);
+                    licensingObject = new LicensingObject(depProject, project.getArtifactId(), version);
+                } catch (ArtifactResolutionException | IOException | XmlPullParserException e) {
+                    logger.error("Could not resolve Artefact; "+depArtefact.toString());
+                    licensingObject = new LicensingObject(dependency, project.getArtifactId(), version);
+                }
                 add(licensingObject);
             }
         }
 
         List<Plugin> plugins = project.getBuild().getPlugins();
         for (Plugin plugin : plugins) {
-            LicensingObject licensingObject = new LicensingObject(plugin, project.getArtifactId(), version);
+            //LicensingObject licensingObject = new LicensingObject(plugin, project.getArtifactId(), version);
+            LicensingObject licensingObject;
+            Artifact depArtefact = new DefaultArtifact(plugin.getGroupId(),plugin.getArtifactId(),"pom",plugin.getVersion());
+            try {
+                MavenProject depProject = Utils.resolveArtefact(project, depArtefact);
+                licensingObject = new LicensingObject(depProject, project.getArtifactId(), version);
+            } catch (ArtifactResolutionException | IOException | XmlPullParserException e) {
+                logger.error("Could not resolve Artefact; "+depArtefact.toString());
+                licensingObject = new LicensingObject(plugin, project.getArtifactId(), version);
+            }
             add(licensingObject);
         }
     }

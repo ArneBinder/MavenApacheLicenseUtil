@@ -18,11 +18,14 @@ package licenseUtil;
 import com.google.common.base.Strings;
 import org.apache.commons.csv.CSVRecord;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.License;
 import org.apache.maven.model.Plugin;
+import org.apache.maven.project.MavenProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by Arne Binder (arne.b.binder@gmail.com) on 10.09.2015.
@@ -35,6 +38,7 @@ public class LicensingObject extends HashMap<String, String> {
         VERSION("version"),
         BUNDLE("bundle"),
         LICENSE("license"),
+        LICENSE_URL("licenseUrl"),
         COPYRIGHT_INFORMATION("copyRightInformation"),
         LIBRARY_NAME("libraryName");
 
@@ -66,6 +70,33 @@ public class LicensingObject extends HashMap<String, String> {
 
     final Logger logger = LoggerFactory.getLogger(LicensingObject.class);
     static final HashSet<String> keyHeaders = new HashSet<>(Arrays.asList(ColumnHeader.ARTIFACT_ID.value(), ColumnHeader.GROUP_ID.value(), ColumnHeader.VERSION.value()));
+
+    LicensingObject(MavenProject project, String includingProject, String version) {
+        super();
+        logger.info("RESOLVED");
+        put(ColumnHeader.ARTIFACT_ID.value(), project.getArtifactId());
+        put(ColumnHeader.GROUP_ID.value(), project.getGroupId());
+        put(ColumnHeader.VERSION.value(), project.getVersion());
+
+        if(project.getLicenses()!=null && !project.getLicenses().isEmpty()){
+            String licenseNames = "";
+            String licenseUrls = "";
+            int i = 0;
+            for(License license:project.getLicenses()) {
+                if (i++ > 0) {
+                    licenseNames += "|";
+                    licenseUrls += "|";
+                }
+                licenseNames += license.getName();
+                if (!Strings.isNullOrEmpty(license.getUrl()))
+                    licenseUrls += license.getUrl();
+            }
+            put(ColumnHeader.LICENSE.value(), licenseNames);
+            put(ColumnHeader.LICENSE_URL.value(), licenseUrls);
+        }
+        put(includingProject, version);
+        clean();
+    }
 
     LicensingObject(Dependency dependency, String includingProject, String version) {
         super();

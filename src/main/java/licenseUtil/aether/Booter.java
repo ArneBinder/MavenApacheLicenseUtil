@@ -39,7 +39,9 @@ public class Booter
     {
         DefaultRepositorySystemSession session = MavenRepositorySystemUtils.newSession();
 
-        LocalRepository localRepo = new LocalRepository( "target/local-repo" );
+        //LocalRepository localRepo = new LocalRepository( "target/local-repo" );
+        LocalRepository localRepo = new LocalRepository( System.getProperty("user.home")+"/.m2/repository" );
+
         session.setLocalRepositoryManager( system.newLocalRepositoryManager( session, localRepo ) );
 
         session.setTransferListener( new ConsoleTransferListener() );

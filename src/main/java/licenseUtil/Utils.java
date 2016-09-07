@@ -38,7 +38,6 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 
 import java.io.*;
-import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -191,7 +190,7 @@ public class Utils {
 
     }*/
 
-    public static MavenProject resolveDependency(MavenProject project, Dependency dependency) throws ArtifactResolutionException, IOException, XmlPullParserException {
+    public static MavenProject resolveArtefact(MavenProject project, Artifact artifact) throws ArtifactResolutionException, IOException, XmlPullParserException {
 
         System.out.println( "------------------------------------------------------------" );
         //System.out.println( ResolveArtifact.class.getSimpleName() );
@@ -200,7 +199,7 @@ public class Utils {
 
         RepositorySystemSession session = Booter.newRepositorySystemSession( system );
 
-        Artifact artifact = new DefaultArtifact(dependency.getArtifact().getGroupId(),dependency.getArtifact().getArtifactId(),"pom",dependency.getArtifact().getVersion()); //( "org.eclipse.aether:aether-impl:1.0.0.v20140518" );
+        //Artifact artifact = new DefaultArtifact(dependency.getArtifact().getGroupId(),dependency.getArtifact().getArtifactId(),"pom",dependency.getArtifact().getVersion()); //( "org.eclipse.aether:aether-impl:1.0.0.v20140518" );
 
         //Artifact artifact = new DefaultArtifact( "org.eclipse.aether:aether-util:1.0.0.v20140518" );
         ArtifactRequest artifactRequest = new ArtifactRequest();
@@ -246,8 +245,8 @@ public class Utils {
         for ( Dependency dependency : descriptorResult.getDependencies() )
         {
             System.out.println( dependency );
-            MavenProject dep = resolveDependency(project, dependency);
-            //System.out.println("assd");
+            MavenProject dep = resolveArtefact(project, new DefaultArtifact(dependency.getArtifact().getGroupId(),dependency.getArtifact().getArtifactId(),"pom",dependency.getArtifact().getVersion()));
+            System.out.println("LICENSE: "+dep.getLicenses().toString());
         }
     }
 
