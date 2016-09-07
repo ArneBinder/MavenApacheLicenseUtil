@@ -65,13 +65,14 @@ public class LicensingObject extends HashMap<String, String> {
     }
 
     static final char textMarker = '"';
+    static final char licenseSeparator = '|';
     private final static Set<String> MARKED_AS_TEXT = Collections.unmodifiableSet(
             new HashSet<>(Arrays.asList(ColumnHeader.VERSION.value())));
 
     final Logger logger = LoggerFactory.getLogger(LicensingObject.class);
     static final HashSet<String> keyHeaders = new HashSet<>(Arrays.asList(ColumnHeader.ARTIFACT_ID.value(), ColumnHeader.GROUP_ID.value(), ColumnHeader.VERSION.value()));
 
-    LicensingObject(MavenProject project, String includingProject, String version) {
+    LicensingObject(MavenProject project, String includingProject, String version, Map<String, String> licenseUrlFileMappings) {
         super();
         logger.info("RESOLVED");
         put(ColumnHeader.ARTIFACT_ID.value(), project.getArtifactId());
@@ -81,17 +82,23 @@ public class LicensingObject extends HashMap<String, String> {
         if(project.getLicenses()!=null && !project.getLicenses().isEmpty()){
             String licenseNames = "";
             String licenseUrls = "";
+            String licenseFN = null;
             int i = 0;
             for(License license:project.getLicenses()) {
+                licenseFN = Utils.getValue(licenseUrlFileMappings, license.getUrl());
                 if (i++ > 0) {
-                    licenseNames += "|";
-                    licenseUrls += "|";
+                    licenseNames += licenseSeparator;
+                    licenseUrls += licenseSeparator;
                 }
                 licenseNames += license.getName();
                 if (!Strings.isNullOrEmpty(license.getUrl()))
                     licenseUrls += license.getUrl();
             }
-            put(ColumnHeader.LICENSE.value(), licenseNames);
+            if(licenseFN != null){
+                put(ColumnHeader.LICENSE.value(), licenseFN);
+            }else {
+                put(ColumnHeader.LICENSE.value(), licenseNames);
+            }
             put(ColumnHeader.LICENSE_URL.value(), licenseUrls);
         }
         put(includingProject, version);

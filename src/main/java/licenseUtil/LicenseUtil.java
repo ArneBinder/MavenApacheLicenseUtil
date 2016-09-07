@@ -136,13 +136,14 @@ public class LicenseUtil {
         }else if(args[0].equals("--test")){
             String pomFN = args[1];
 
-            MavenProject project = null;
+            LicensingList licensingList = new LicensingList();
+            /*MavenProject project = null;
             try {
                 project = Utils.readPom(new File(pomFN));
 
             } catch (XmlPullParserException e) {
                 logger.error("Could not parse pom file: \""+pomFN+"\"");
-            }
+            }*/
 
             /*try {
                 Utils.testResolveArtefact(project);
@@ -150,11 +151,11 @@ public class LicenseUtil {
                 e.printStackTrace();
             }*/
 
-            try {
+            /*try {
                 Utils.test(project);
             } catch (ArtifactDescriptorException | XmlPullParserException | ArtifactResolutionException e) {
                 e.printStackTrace();
-            }
+            }*/
             //try {
                 //SortedMap<String, MavenProject> licenses = Utils.loadProjectDependencies(project);
             //} catch (ProjectBuildingException e) {
@@ -171,7 +172,12 @@ public class LicenseUtil {
         File[] subdirs = directory.listFiles((FileFilter) DirectoryFileFilter.DIRECTORY);
         LicensingList all = new LicensingList();
         for (File dir : subdirs) {
-            logger.info("process module: " + dir.getName());
+            logger.info("process directory: " + dir.getName());
+            File gitDir = new File(dir.getPath()+File.separator+".git");
+            if(gitDir.exists()) {
+                logger.info("update local repository");
+                Utils.updateRepository(dir.getPath());
+            }
 
             // check if pom.xml is available
             File pomFile = new File(dir.getPath()+File.separator+"pom.xml");
@@ -185,8 +191,6 @@ public class LicenseUtil {
                 licensingList.addAll(processProjectsInFolder(dir,spreadSheetFN,currentVersion));
             }
 
-            logger.info("update local repository");
-            Utils.updateRepository(dir.getPath());
             logger.info("build effective-pom");
             File pom = new File(dir.getPath()+File.separator+EFFECTIVE_POM_FN);
             Utils.writeEffectivePom(new File(dir.getPath()), pom.getAbsolutePath());

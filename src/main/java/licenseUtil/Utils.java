@@ -17,6 +17,7 @@ package licenseUtil;
 
 
 import licenseUtil.aether.Booter;
+import org.apache.commons.io.IOUtils;
 import org.apache.maven.cli.MavenCli;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -29,6 +30,8 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
+import org.nibor.autolink.LinkExtractor;
+import org.nibor.autolink.LinkSpan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,8 +41,8 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 
 import java.io.*;
-import java.util.LinkedList;
-import java.util.List;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
 
 /**
  * Created by Arne Binder (arne.b.binder@gmail.com) on 10.09.2015.
@@ -249,6 +252,22 @@ public class Utils {
             System.out.println("LICENSE: "+dep.getLicenses().toString());
         }
     }
+
+
+    static public String getValue(Map<String, String> map, String key){
+        if(map.containsKey(key))
+            return map.get(key);
+
+        if(key==null)
+            return null;
+        for(String k: map.keySet()){
+            if(k.contains(key) || key.contains(k))
+                return map.get(k);
+        }
+
+        return null;
+    }
+
 
     /*public static SortedMap<String, MavenProject> loadProjectDependencies(MavenProject project
                                                                    //,ArtifactRepository localRepository,

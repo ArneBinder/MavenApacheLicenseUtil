@@ -19,6 +19,8 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVPrinter;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.io.Charsets;
+import org.apache.commons.io.IOUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
@@ -26,11 +28,14 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.nibor.autolink.LinkExtractor;
+import org.nibor.autolink.LinkSpan;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.URISyntaxException;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
@@ -38,14 +43,16 @@ import java.util.*;
  */
 public class LicensingList extends ArrayList<LicensingObject> {
 
-    final Logger logger = LoggerFactory.getLogger(LicensingList.class);
+    final static Logger logger = LoggerFactory.getLogger(LicensingList.class);
 
     static final char columnDelimiter = '\t';
     static final String excludedScope = "test";
     static final CharSequence libraryListPlaceholder = "#librarylist";
-    static final String licenseTextDirectory = "/templates/";
+    static final String licenseTextDirectory = "templates/";
     static final Boolean aggregateByBundle = false;
     static final String forceAddingLibraryKeyword = "KEEP";
+
+    private static Map<String, String> licenseUrlMappings = constructLicenseUrlFileMapping();
 
     public void readFromSpreadsheet(String spreadsheetFN, String currentVersion) throws IOException {
         logger.info("read spreadsheet from \"" + spreadsheetFN + "\"");
@@ -137,7 +144,7 @@ public class LicensingList extends ArrayList<LicensingObject> {
         Collections.sort(sortedLicenseNames);
         for(String key: sortedLicenseNames){
             InputStream inputStream = null;
-            String fn = licenseTextDirectory + key;
+            String fn = "/"+licenseTextDirectory + key;
             inputStream = getClass().getResourceAsStream(fn);
             if(inputStream!=null){
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
@@ -184,7 +191,7 @@ public class LicensingList extends ArrayList<LicensingObject> {
                 Artifact depArtefact = new DefaultArtifact(dependency.getGroupId(),dependency.getArtifactId(),"pom",dependency.getVersion());
                 try {
                     MavenProject depProject = Utils.resolveArtefact(project, depArtefact);
-                    licensingObject = new LicensingObject(depProject, project.getArtifactId(), version);
+                    licensingObject = new LicensingObject(depProject, project.getArtifactId(), version, licenseUrlMappings);
                 } catch (ArtifactResolutionException | IOException | XmlPullParserException e) {
                     logger.error("Could not resolve Artefact; "+depArtefact.toString());
                     licensingObject = new LicensingObject(dependency, project.getArtifactId(), version);
@@ -200,7 +207,7 @@ public class LicensingList extends ArrayList<LicensingObject> {
             Artifact depArtefact = new DefaultArtifact(plugin.getGroupId(),plugin.getArtifactId(),"pom",plugin.getVersion());
             try {
                 MavenProject depProject = Utils.resolveArtefact(project, depArtefact);
-                licensingObject = new LicensingObject(depProject, project.getArtifactId(), version);
+                licensingObject = new LicensingObject(depProject, project.getArtifactId(), version, licenseUrlMappings);
             } catch (ArtifactResolutionException | IOException | XmlPullParserException e) {
                 logger.error("Could not resolve Artefact; "+depArtefact.toString());
                 licensingObject = new LicensingObject(plugin, project.getArtifactId(), version);
@@ -226,6 +233,55 @@ public class LicensingList extends ArrayList<LicensingObject> {
                 i.remove();
             }
         }
+    }
+
+    public static Map<String, String> constructLicenseUrlFileMapping() {
+
+        Map<String, String> result = new HashMap<>();
+        try {
+            List<String> files = IOUtils.readLines(LicensingList.class.getClassLoader()
+                    .getResourceAsStream(licenseTextDirectory), StandardCharsets.UTF_8);
+
+            LinkExtractor linkExtractor = LinkExtractor.builder().build();
+            for (String licenseFN : files) {
+                InputStream inputStream;
+                String fn = "/" + licenseTextDirectory + licenseFN;
+                inputStream = LicensingList.class.getResourceAsStream(fn);
+
+                String link;
+                if (inputStream != null) {
+                    BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
+                    boolean foundUrl = false;
+                    boolean foundListPlaceholder = false;
+                    String line;
+                    while ((line = bufferedReader.readLine()) != null) {
+                        if (line.toLowerCase().contains(libraryListPlaceholder)) {
+                            foundListPlaceholder = true;
+                            break;
+                        }
+                        Iterable<LinkSpan> links = linkExtractor.extractLinks(line);
+                        while (links.iterator().hasNext()) {
+                            LinkSpan linkSpan = links.iterator().next();
+                            link = line.substring(linkSpan.getBeginIndex(), linkSpan.getEndIndex());
+                            result.put(link, licenseFN);
+                            foundUrl = true;
+                        }
+                    }
+                    bufferedReader.close();
+
+                    if (!foundUrl)
+                        logger.warn("No license URL found in " + licenseFN + " template file.");
+                    if (!foundListPlaceholder) {
+                        String msg = "Library list placeholder (" + libraryListPlaceholder + ") not found in " + licenseFN + " template file.";
+                        logger.error(msg);
+                        throw new RuntimeException(msg);
+                    }
+                }
+            }
+        }catch(final IOException ex){
+            throw new RuntimeException(ex);
+        }
+        return result;
     }
 
     @Override
