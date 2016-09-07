@@ -19,6 +19,8 @@ import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
+import org.eclipse.aether.resolution.ArtifactDescriptorException;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.jgit.util.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -145,7 +147,7 @@ public class LicenseUtil {
 
             try {
                 Utils.test();
-            } catch (org.eclipse.aether.resolution.DependencyResolutionException e) {
+            } catch (ArtifactDescriptorException e) {
                 e.printStackTrace();
             }
             //try {

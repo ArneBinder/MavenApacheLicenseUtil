@@ -16,34 +16,25 @@
 package licenseUtil;
 
 
-
+import licenseUtil.aether.Booter;
 import org.apache.maven.cli.MavenCli;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
-import org.eclipse.aether.RepositorySystem;
-import org.eclipse.aether.RepositorySystemSession;
-import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.artifact.DefaultArtifact;
-import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.graph.Dependency;
-import org.eclipse.aether.graph.DependencyFilter;
-import org.eclipse.aether.resolution.ArtifactResult;
-import org.eclipse.aether.resolution.DependencyRequest;
-import org.eclipse.aether.resolution.DependencyResolutionException;
-import org.eclipse.aether.util.artifact.JavaScopes;
-import org.eclipse.aether.util.filter.DependencyFilterUtils;
+import org.eclipse.aether.resolution.*;
 import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.*;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-import java.util.List;
-
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
 
 import java.io.*;
 
@@ -196,10 +187,32 @@ public class Utils {
 
     }*/
 
-    public static void test() throws DependencyResolutionException, org.eclipse.aether.resolution.DependencyResolutionException {
+    public static void testResolveArtefact() throws ArtifactResolutionException {
 
-        /*System.out.println( "------------------------------------------------------------" );
-        //System.out.println( ResolveTransitiveDependencies.class.getSimpleName() );
+        System.out.println( "------------------------------------------------------------" );
+        //System.out.println( ResolveArtifact.class.getSimpleName() );
+
+        RepositorySystem system = Booter.newRepositorySystem();
+
+        RepositorySystemSession session = Booter.newRepositorySystemSession( system );
+
+        Artifact artifact = new DefaultArtifact( "org.eclipse.aether:aether-util:1.0.0.v20140518" );
+
+        ArtifactRequest artifactRequest = new ArtifactRequest();
+        artifactRequest.setArtifact( artifact );
+        artifactRequest.setRepositories( Booter.newRepositories( system, session ) );
+
+        ArtifactResult artifactResult = system.resolveArtifact( session, artifactRequest );
+
+        artifact = artifactResult.getArtifact();
+
+        System.out.println( artifact + " resolved to  " + artifact.getFile() );
+
+    }
+
+    public static void test() throws ArtifactDescriptorException {
+        System.out.println( "------------------------------------------------------------" );
+        //System.out.println( GetDirectDependencies.class.getSimpleName() );
 
         RepositorySystem system = Booter.newRepositorySystem();
 
@@ -207,22 +220,16 @@ public class Utils {
 
         Artifact artifact = new DefaultArtifact( "org.eclipse.aether:aether-impl:1.0.0.v20140518" );
 
-        DependencyFilter classpathFlter = DependencyFilterUtils.classpathFilter( JavaScopes.COMPILE );
+        ArtifactDescriptorRequest descriptorRequest = new ArtifactDescriptorRequest();
+        descriptorRequest.setArtifact( artifact );
+        descriptorRequest.setRepositories( Booter.newRepositories( system, session ) );
 
-        CollectRequest collectRequest = new CollectRequest();
-        collectRequest.setRoot( new Dependency( artifact, JavaScopes.COMPILE ) );
-        collectRequest.setRepositories( Booter.newRepositories( system, session ) );
+        ArtifactDescriptorResult descriptorResult = system.readArtifactDescriptor( session, descriptorRequest );
 
-        DependencyRequest dependencyRequest = new DependencyRequest( collectRequest, classpathFlter );
-
-        List<ArtifactResult> artifactResults =
-                system.resolveDependencies( session, dependencyRequest ).getArtifactResults();
-
-        for ( ArtifactResult artifactResult : artifactResults )
+        for ( Dependency dependency : descriptorResult.getDependencies() )
         {
-            System.out.println( artifactResult.getArtifact() + " resolved to " + artifactResult.getArtifact().getFile() );
-        }*/
-
+            System.out.println( dependency );
+        }
     }
 
     /*public static SortedMap<String, MavenProject> loadProjectDependencies(MavenProject project
