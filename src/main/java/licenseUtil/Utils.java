@@ -191,7 +191,7 @@ public class Utils {
 
     }*/
 
-    public static void testResolveArtefact(MavenProject project) throws ArtifactResolutionException {
+    public static MavenProject resolveDependency(MavenProject project, Dependency dependency) throws ArtifactResolutionException, IOException, XmlPullParserException {
 
         System.out.println( "------------------------------------------------------------" );
         //System.out.println( ResolveArtifact.class.getSimpleName() );
@@ -200,10 +200,9 @@ public class Utils {
 
         RepositorySystemSession session = Booter.newRepositorySystemSession( system );
 
-        Artifact artifact = new DefaultArtifact(project.getGroupId(),project.getArtifactId(),project.getPackaging(),project.getVersion()); //( "org.eclipse.aether:aether-impl:1.0.0.v20140518" );
+        Artifact artifact = new DefaultArtifact(dependency.getArtifact().getGroupId(),dependency.getArtifact().getArtifactId(),"pom",dependency.getArtifact().getVersion()); //( "org.eclipse.aether:aether-impl:1.0.0.v20140518" );
 
         //Artifact artifact = new DefaultArtifact( "org.eclipse.aether:aether-util:1.0.0.v20140518" );
-
         ArtifactRequest artifactRequest = new ArtifactRequest();
         artifactRequest.setArtifact( artifact );
 
@@ -220,9 +219,10 @@ public class Utils {
 
         System.out.println( artifact + " resolved to  " + artifact.getFile() );
 
+        return Utils.readPom(artifact.getFile());
     }
 
-    public static void test(MavenProject project) throws ArtifactDescriptorException {
+    public static void test(MavenProject project) throws ArtifactDescriptorException, XmlPullParserException, IOException, ArtifactResolutionException {
         System.out.println( "------------------------------------------------------------" );
         //System.out.println( GetDirectDependencies.class.getSimpleName() );
 
@@ -246,6 +246,8 @@ public class Utils {
         for ( Dependency dependency : descriptorResult.getDependencies() )
         {
             System.out.println( dependency );
+            MavenProject dep = resolveDependency(project, dependency);
+            //System.out.println("assd");
         }
     }
 
