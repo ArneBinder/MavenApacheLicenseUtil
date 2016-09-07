@@ -172,18 +172,18 @@ public class LicenseUtil {
         File[] subdirs = directory.listFiles((FileFilter) DirectoryFileFilter.DIRECTORY);
         LicensingList all = new LicensingList();
         for (File dir : subdirs) {
+            // check if pom.xml is available
+            File pomFile = new File(dir.getPath()+File.separator+"pom.xml");
+            if(!pomFile.exists()){
+                logger.debug("skip directory: "+dir.getName()+", no pom.xml available");
+                continue;
+            }
+
             logger.info("process directory: " + dir.getName());
             File gitDir = new File(dir.getPath()+File.separator+".git");
             if(gitDir.exists()) {
                 logger.info("update local repository");
                 Utils.updateRepository(dir.getPath());
-            }
-
-            // check if pom.xml is available
-            File pomFile = new File(dir.getPath()+File.separator+"pom.xml");
-            if(!pomFile.exists()){
-                logger.info("skip directory: "+dir.getName()+", no pom.xml available");
-                continue;
             }
 
             LicensingList licensingList = new LicensingList();

@@ -259,9 +259,10 @@ public class LicensingList extends ArrayList<LicensingObject> {
                             foundListPlaceholder = true;
                             break;
                         }
-                        Iterable<LinkSpan> links = linkExtractor.extractLinks(line);
-                        while (links.iterator().hasNext()) {
-                            LinkSpan linkSpan = links.iterator().next();
+                        //Iterable<LinkSpan> links = linkExtractor.extractLinks(line);
+                        Iterator<LinkSpan> it = linkExtractor.extractLinks(line).iterator();
+                        while (it.hasNext()) {
+                            LinkSpan linkSpan = it.next();
                             link = line.substring(linkSpan.getBeginIndex(), linkSpan.getEndIndex());
                             result.put(link, licenseFN);
                             foundUrl = true;
