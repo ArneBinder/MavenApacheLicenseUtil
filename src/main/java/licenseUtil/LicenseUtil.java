@@ -112,10 +112,6 @@ public class LicenseUtil {
             String spreadSheetFN = args[2];
             String currentVersion = args[3];
             LicensingList licensingList = new LicensingList();
-            File f = new File(spreadSheetFN);
-            if (f.exists() && !f.isDirectory()) {
-                licensingList.readFromSpreadsheet(spreadSheetFN, currentVersion);
-            }
             licensingList.addAll(processProjectsInFolder(directory, spreadSheetFN, currentVersion,false));
             licensingList.writeToSpreadsheet(spreadSheetFN);
 
@@ -176,8 +172,12 @@ public class LicenseUtil {
 
     public static LicensingList processProjectsInFolder(File directory, String spreadSheetFN, String currentVersion, Boolean mavenProjectsOnly) throws IOException {
 
-
         LicensingList result = new LicensingList();
+        File f = new File(spreadSheetFN);
+        if (f.exists() && !f.isDirectory()) {
+            result.readFromSpreadsheet(spreadSheetFN, currentVersion);
+        }
+
         File[] subdirs = directory.listFiles((FileFilter) DirectoryFileFilter.DIRECTORY);
         File gitDir = new File(directory.getPath()+File.separator+".git");
         File pomFile = new File(directory.getPath()+File.separator+"pom.xml");
