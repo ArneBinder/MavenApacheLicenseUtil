@@ -230,6 +230,7 @@ public class Utils {
         for( org.apache.maven.model.Repository repository: project.getModel().getRepositories()){
             remotes.add(new RemoteRepository.Builder(repository.getId(), "default", repository.getUrl()).build());
         }
+        remotes.add(Booter.newCentralRepository());
         descriptorRequest.setRepositories( remotes );
 
         ArtifactDescriptorResult descriptorResult = system.readArtifactDescriptor( session, descriptorRequest );

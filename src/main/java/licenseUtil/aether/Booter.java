@@ -56,7 +56,7 @@ public class Booter
         return new ArrayList<RemoteRepository>( Arrays.asList( newCentralRepository() ) );
     }
 
-    private static RemoteRepository newCentralRepository()
+    public static RemoteRepository newCentralRepository()
     {
         return new RemoteRepository.Builder( "central", "default", "http://central.maven.org/maven2/" ).build();
     }
