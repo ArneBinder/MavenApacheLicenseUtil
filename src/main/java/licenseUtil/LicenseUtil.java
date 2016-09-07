@@ -146,7 +146,7 @@ public class LicenseUtil {
 
 
             try {
-                Utils.test();
+                Utils.test(project);
             } catch (ArtifactDescriptorException e) {
                 e.printStackTrace();
             }

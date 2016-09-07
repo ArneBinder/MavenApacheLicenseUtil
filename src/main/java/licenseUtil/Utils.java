@@ -23,6 +23,7 @@ import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.*;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -37,6 +38,9 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
 
 import java.io.*;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Created by Arne Binder (arne.b.binder@gmail.com) on 10.09.2015.
@@ -210,7 +214,7 @@ public class Utils {
 
     }
 
-    public static void test() throws ArtifactDescriptorException {
+    public static void test(MavenProject project) throws ArtifactDescriptorException {
         System.out.println( "------------------------------------------------------------" );
         //System.out.println( GetDirectDependencies.class.getSimpleName() );
 
@@ -218,11 +222,15 @@ public class Utils {
 
         RepositorySystemSession session = Booter.newRepositorySystemSession( system );
 
-        Artifact artifact = new DefaultArtifact( "org.eclipse.aether:aether-impl:1.0.0.v20140518" );
+        Artifact artifact = new DefaultArtifact(project.getGroupId(),project.getArtifactId(),project.getPackaging(),project.getVersion()); //( "org.eclipse.aether:aether-impl:1.0.0.v20140518" );
 
         ArtifactDescriptorRequest descriptorRequest = new ArtifactDescriptorRequest();
         descriptorRequest.setArtifact( artifact );
-        descriptorRequest.setRepositories( Booter.newRepositories( system, session ) );
+        List<RemoteRepository> remotes = new LinkedList<>();
+        for( org.apache.maven.model.Repository repository: project.getModel().getRepositories()){
+            remotes.add(new RemoteRepository.Builder(repository.getId(), "default", repository.getUrl()).build());
+        }
+        descriptorRequest.setRepositories( remotes );
 
         ArtifactDescriptorResult descriptorResult = system.readArtifactDescriptor( session, descriptorRequest );
 
