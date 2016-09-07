@@ -95,7 +95,7 @@ public class LicensingObject extends HashMap<String, String> {
             put(ColumnHeader.LICENSE_URL.value(), licenseUrls);
         }
         put(includingProject, version);
-        clean();
+        //clean();
     }
 
     LicensingObject(Dependency dependency, String includingProject, String version) {
@@ -104,7 +104,7 @@ public class LicensingObject extends HashMap<String, String> {
         put(ColumnHeader.GROUP_ID.value(), dependency.getGroupId());
         put(ColumnHeader.VERSION.value(), dependency.getVersion());
         put(includingProject, version);
-        clean();
+        //clean();
     }
 
     LicensingObject(Plugin plugin, String includingProject, String version) {
@@ -113,7 +113,7 @@ public class LicensingObject extends HashMap<String, String> {
         put(ColumnHeader.GROUP_ID.value(), plugin.getGroupId());
         put(ColumnHeader.VERSION.value(), plugin.getVersion());
         put(includingProject, version);
-        clean();
+        //clean();
     }
 
     LicensingObject(CSVRecord record) {
