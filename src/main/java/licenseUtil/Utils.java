@@ -191,7 +191,7 @@ public class Utils {
 
     }*/
 
-    public static void testResolveArtefact() throws ArtifactResolutionException {
+    public static void testResolveArtefact(MavenProject project) throws ArtifactResolutionException {
 
         System.out.println( "------------------------------------------------------------" );
         //System.out.println( ResolveArtifact.class.getSimpleName() );
@@ -200,11 +200,19 @@ public class Utils {
 
         RepositorySystemSession session = Booter.newRepositorySystemSession( system );
 
-        Artifact artifact = new DefaultArtifact( "org.eclipse.aether:aether-util:1.0.0.v20140518" );
+        Artifact artifact = new DefaultArtifact(project.getGroupId(),project.getArtifactId(),project.getPackaging(),project.getVersion()); //( "org.eclipse.aether:aether-impl:1.0.0.v20140518" );
+
+        //Artifact artifact = new DefaultArtifact( "org.eclipse.aether:aether-util:1.0.0.v20140518" );
 
         ArtifactRequest artifactRequest = new ArtifactRequest();
         artifactRequest.setArtifact( artifact );
-        artifactRequest.setRepositories( Booter.newRepositories( system, session ) );
+
+        List<RemoteRepository> remotes = new LinkedList<>();
+        for( org.apache.maven.model.Repository repository: project.getModel().getRepositories()){
+            remotes.add(new RemoteRepository.Builder(repository.getId(), "default", repository.getUrl()).build());
+        }
+        remotes.add(Booter.newCentralRepository());
+        artifactRequest.setRepositories( remotes );
 
         ArtifactResult artifactResult = system.resolveArtifact( session, artifactRequest );
 

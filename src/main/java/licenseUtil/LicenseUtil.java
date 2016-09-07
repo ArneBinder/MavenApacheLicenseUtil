@@ -144,12 +144,17 @@ public class LicenseUtil {
                 logger.error("Could not parse pom file: \""+pomFN+"\"");
             }
 
-
             try {
+                Utils.testResolveArtefact(project);
+            } catch (ArtifactResolutionException e) {
+                e.printStackTrace();
+            }
+
+            /*try {
                 Utils.test(project);
             } catch (ArtifactDescriptorException e) {
                 e.printStackTrace();
-            }
+            }*/
             //try {
                 //SortedMap<String, MavenProject> licenses = Utils.loadProjectDependencies(project);
             //} catch (ProjectBuildingException e) {
