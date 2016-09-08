@@ -22,14 +22,14 @@ which are direct subfolders of `<superDirectory>`, by executing:
 	a license template (see step 2) via the license urls in the [licenses object](https://maven.apache.org/pom.html#Licenses). To
 	achieve this, the headers (everything before the `#libraryListPLaceholder`) of the license templates are scanned for 
 	matching urls and linked to the containing license template. If multiple licenses are mentioned in the 
-	[licenses object](https://maven.apache.org/pom.html#Licenses), the first matching license template will taken.
-	The found license names, urls comments and the file name of the license template are written into the columns 
+	[licenses object](https://maven.apache.org/pom.html#Licenses), the first matching license template will be taken.
+	The license names, urls, comments and the file name of the license template are written into the columns 
 	`licenseNames`, `licenseUrls`, `licenseComments` and `licenseTemplate` of the `<license.stub.tsv>`.
 	
-	If you have an `<licenses.enhanced.tsv>` from an earlier release, use this as `<license.stub.tsv>`. 
+	**Reusing previous license information**: If you have an `<licenses.enhanced.tsv>` from an earlier release, use this as `<license.stub.tsv>`. 
 	The former license information will be kept, just the old `<currentReleaseVersion>` value will be overwritten, 
 	if the library is still in use for the current release.
-
+	
 	**NOTE**: This will overwrite the old `<licenses.enhanced.tsv>`. 
 2. Enhance the licenses.stub.tsv by yourself:
    	- Especially fill the `licenseTemplate` column according to the filenames of the license templates in resources/templates 
