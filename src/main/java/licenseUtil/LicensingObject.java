@@ -36,7 +36,8 @@ public class LicensingObject extends HashMap<String, String> {
         GROUP_ID("groupId"),
         VERSION("version"),
         BUNDLE("bundle"),
-        LICENSE("license"),
+        LICENSE_TEMPLATE("licenseTemplate"),
+        LICENSE_NAMES("licenseNames"),
         LICENSE_URL("licenseUrl"),
         LICENSE_COMMENT("licenseComment"),
         COPYRIGHT_INFORMATION("copyRightInformation"),
@@ -86,6 +87,7 @@ public class LicensingObject extends HashMap<String, String> {
             int i = 0;
             for(License license:project.getLicenses()) {
                 if(license.getUrl()!=null && licenseFN == null)
+                    // remove protocol and lookup license url
                     licenseFN = Utils.getValue(licenseUrlFileMappings, license.getUrl().replaceFirst("^[^:]+://", ""));
                 if (i++ > 0) {
                     licenseNames += licenseSeparator;
@@ -98,13 +100,14 @@ public class LicensingObject extends HashMap<String, String> {
                 if (!Strings.isNullOrEmpty(license.getComments()))
                     licenseComments += license.getComments();
             }
-            if(licenseFN != null){
-                put(ColumnHeader.LICENSE.value(), licenseFN);
-            }else {
-                put(ColumnHeader.LICENSE.value(), licenseNames);
-            }
-            put(ColumnHeader.LICENSE_URL.value(), licenseUrls);
-            put(ColumnHeader.LICENSE_COMMENT.value(), licenseComments);
+            if(!Strings.isNullOrEmpty(licenseFN))
+                put(ColumnHeader.LICENSE_TEMPLATE.value(), licenseFN);
+            if(!Strings.isNullOrEmpty(licenseNames))
+                put(ColumnHeader.LICENSE_NAMES.value(), licenseNames);
+            if(!Strings.isNullOrEmpty(licenseUrls))
+                put(ColumnHeader.LICENSE_URL.value(), licenseUrls);
+            if(!Strings.isNullOrEmpty(licenseComments))
+                put(ColumnHeader.LICENSE_COMMENT.value(), licenseComments);
         }
         put(includingProject, version);
         //clean();

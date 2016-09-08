@@ -11,7 +11,7 @@ and helps you to create LICENSE-3RD-PARTY files.
 
 1. Update local repositories, build effective-poms and add pom content to `<license.stub.tsv>` for all projects, 
 which are direct subfolders of `<superDirectory>`, by executing:
-	- `maven-apache-license-util --processProjectsInFolder <superDirectory> <license.stub.tsv> <currentReleaseVersion>`
+	- `maven-apache-license-util --updateTsvWithProjectsInFolder <superDirectory> <license.stub.tsv> <currentReleaseVersion>`
 	
 	`<currentReleaseVersion>` should be a value, which marks your current release.
 	If you have an `<licenses.enhanced.tsv>` from an earlier release, use this as `<license.stub.tsv>`. 
@@ -20,8 +20,8 @@ which are direct subfolders of `<superDirectory>`, by executing:
 
 	NOTE: This will overwrite the old `<licenses.enhanced.tsv>`. 
 2. Enhance the licenses.stub.tsv by yourself:
-   	- Especially fill the "license" column according to the filenames of the license templates in resources/templates 
-   		(APACHE2, BSD, BSD3, CDDL, EPLV1, GPLV2, GPLV3, H2, JSON, LGPLV3, MIT, SLICKBSD, UNLICENSED).
+   	- Especially fill the "licenseTemplate" column according to the filenames of the license templates in resources/templates 
+   		(APACHE2, BSD, BSD3, CDDL, EPLV1, GPLV2, GPLV3, H2, JSON, LGPLV3, MIT, MPL2, SLICKBSD, UNLICENSE).
    	- Furthermore, fill the column "bundle" and "libraryName" for better readability and "copyRightInformation", 
    		if this information is available.
    	- Add projects which does not use maven manually, if needed. Write "KEEP" at the position of the libraries 
@@ -44,7 +44,7 @@ which are direct subfolders of `<superDirectory>`, by executing:
 
 ##Options
 ```
---processProjectsInFolder <superDirectory> <tsvFile> <currentReleaseVersion>	
+--updateTsvWithProjectsInFolder <superDirectory> <tsvFile> <currentReleaseVersion>	
 	<superDirectory>			The directory containing the project directories.
 	<tsvFile>					The analyzed pom information is written to this file. 
 								If it exists already, the content is merged.

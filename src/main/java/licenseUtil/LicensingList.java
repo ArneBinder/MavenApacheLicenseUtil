@@ -122,7 +122,7 @@ public class LicensingList extends ArrayList<LicensingObject> {
                 String versionString = licensingObject.get(moduleName).toUpperCase();
                 if(versionString.equals(version.toUpperCase()) || versionString.equals(forceAddingLibraryKeyword.toUpperCase())) {
                     HashSet<String> licenseElement;
-                    String licenseKey = licensingObject.get(LicensingObject.ColumnHeader.LICENSE.value());
+                    String licenseKey = licensingObject.get(LicensingObject.ColumnHeader.LICENSE_TEMPLATE.value());
                     if (!licenseList.containsKey(licenseKey)) {
                         licenseElement = new HashSet<>();
                     } else {

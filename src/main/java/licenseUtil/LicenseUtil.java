@@ -98,7 +98,7 @@ public class LicenseUtil {
             }
         }else if(args[0].equals("--buildEffectivePom")){
                 Utils.writeEffectivePom(new File(args[1]), (new File(EFFECTIVE_POM_FN)).getAbsolutePath());
-        }else if(args[0].equals("--processProjectsInFolder")){
+        }else if(args[0].equals("--updateTsvWithProjectsInFolder")){
             if(args.length<4)
                 logger.error("Missing arguments for option --processProjectsInFolder. Please provide <superDirectory> <licenses.stub.tsv> and <currentVersion> or use the option --help for further information.");
             File directory = new File(args[1]);
@@ -190,6 +190,11 @@ public class LicenseUtil {
             for (String module : project.getModules()) {
                 File subdirectory = new File(directory + File.separator + module);
                 result.addAll(processProjectsInFolder(subdirectory, currentVersion, true));
+            }
+
+            // add all licence objects of child modules
+            for(LicensingObject licensingObject: result){
+                licensingObject.put(project.getArtifactId(), currentVersion);
             }
 
             result.addMavenProject(project, currentVersion);
