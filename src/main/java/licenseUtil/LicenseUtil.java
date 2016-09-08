@@ -57,7 +57,7 @@ public class LicenseUtil {
             LicensingList licensingList = new LicensingList();
             File f = new File(spreadSheetFN);
             if (f.exists() && !f.isDirectory()) {
-                licensingList.readFromSpreadsheet(spreadSheetFN, currentVersion);
+                licensingList.readFromSpreadsheet(spreadSheetFN);
             }
 
             licensingList.addMavenProject(project, currentVersion);
@@ -73,14 +73,17 @@ public class LicenseUtil {
             HashMap<String, String> targetDirs = new HashMap<>();
             if(args.length > 4){
                 File targetDir = new File(args[4]);
+                logger.info("scan pom files in direct subdirectories of \""+targetDir.getPath()+"\" to obtain target locations for 3rd party license files...");
                 File[] subdirs = targetDir.listFiles((FileFilter) DirectoryFileFilter.DIRECTORY);
                 for(File subdir: subdirs){
-                    String pomFN = subdir.getPath()+File.separator+POM_FN;
+                    File pomFile = new File(subdir.getPath()+File.separator+POM_FN);
+                    if(!pomFile.exists())
+                        continue;
                     MavenProject mavenProject;
                     try {
-                        mavenProject = Utils.readPom(new File(pomFN));
+                        mavenProject = Utils.readPom(pomFile);
                     } catch (Exception e) {
-                        logger.warn("Could not read from pom file: \""+pomFN+"\" because of "+e.getMessage());
+                        logger.warn("Could not read from pom file: \""+pomFile.getPath()+"\" because of "+e.getMessage());
                         continue;
                     }
                     targetDirs.put(mavenProject.getModel().getArtifactId(), subdir.getAbsolutePath());
@@ -88,13 +91,21 @@ public class LicenseUtil {
             }
 
             LicensingList licensingList = new LicensingList();
-            licensingList.readFromSpreadsheet(spreadSheetFN, currentVersion);
+            licensingList.readFromSpreadsheet(spreadSheetFN);
             if(processModule.toUpperCase().equals("ALL")){
                 for(String module: licensingList.getNonFixedHeaders()){
-                    writeLicense3rdPartyFile(module,licensingList,currentVersion,targetDirs.get(module));
+                    try {
+                        writeLicense3rdPartyFile(module,licensingList,currentVersion,targetDirs.get(module));
+                    } catch (NoLicenseTemplateSetException e) {
+                        logger.error("Could not write file for module \""+module+"\". There is no template specified for \""+e.getLicensingObject()+"\". Please add an existing template filename to the column \""+ LicensingObject.ColumnHeader.LICENSE_TEMPLATE.value()+"\" of \""+spreadSheetFN+"\".");
+                    }
                 }
             }else {
-                writeLicense3rdPartyFile(processModule,licensingList,currentVersion,targetDirs.get(processModule));
+                try {
+                    writeLicense3rdPartyFile(processModule,licensingList,currentVersion,targetDirs.get(processModule));
+                } catch (NoLicenseTemplateSetException e) {
+                    logger.error("Could not write file for module \""+processModule+"\". There is no template specified for \""+e.getLicensingObject()+"\". Please add an existing template filename to the column \""+ LicensingObject.ColumnHeader.LICENSE_TEMPLATE.value()+"\" of \""+spreadSheetFN+"\".");
+                }
             }
         }else if(args[0].equals("--buildEffectivePom")){
                 Utils.writeEffectivePom(new File(args[1]), (new File(EFFECTIVE_POM_FN)).getAbsolutePath());
@@ -107,7 +118,7 @@ public class LicenseUtil {
             LicensingList licensingList = new LicensingList();
             File f = new File(spreadSheetFN);
             if (f.exists() && !f.isDirectory()) {
-                licensingList.readFromSpreadsheet(spreadSheetFN, currentVersion);
+                licensingList.readFromSpreadsheet(spreadSheetFN);
             }
             licensingList.addAll(processProjectsInFolder(directory, currentVersion, false));
             licensingList.writeToSpreadsheet(spreadSheetFN);
@@ -120,7 +131,7 @@ public class LicenseUtil {
             String currentVersion = args[3];
 
             LicensingList licensingList = new LicensingList();
-            licensingList.readFromSpreadsheet(spreadSheetIN, currentVersion);
+            licensingList.readFromSpreadsheet(spreadSheetIN);
             licensingList.purge(currentVersion);
             licensingList.writeToSpreadsheet(spreadSheetOUT);
 
@@ -131,10 +142,6 @@ public class LicenseUtil {
             while((line = reader.readLine()) !=null){
                 System.out.println(line);
             }
-        }else if(args[0].equals("--test")){
-            String pomFN = args[1];
-
-            LicensingList licensingList = new LicensingList();
         }else{
             logger.error("Unknown parameter: " + args[0] + ". Use --help to get a list of the possible options.");
         }
@@ -202,7 +209,7 @@ public class LicenseUtil {
         return result;
     }
 
-    public static void writeLicense3rdPartyFile(String module, LicensingList licensingList, String currentVersion, String targetDir) throws IOException {
+    public static void writeLicense3rdPartyFile(String module, LicensingList licensingList, String currentVersion, String targetDir) throws IOException, NoLicenseTemplateSetException {
         if(targetDir!=null){
             File new3rdPartyLicenseFile = new File(targetDir+File.separator + LICENSE_3RD_PARTY_FN);
             Utils.updateRepository(targetDir);

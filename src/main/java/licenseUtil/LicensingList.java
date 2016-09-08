@@ -52,7 +52,7 @@ public class LicensingList extends ArrayList<LicensingObject> {
 
     private static Map<String, String> licenseUrlMappings = constructLicenseUrlFileMapping();
 
-    public void readFromSpreadsheet(String spreadsheetFN, String currentVersion) throws IOException, IncompleteLicenseObjectException {
+    public void readFromSpreadsheet(String spreadsheetFN) throws IOException, IncompleteLicenseObjectException {
         logger.info("read spreadsheet from \"" + spreadsheetFN + "\"");
         InputStreamReader inputStreamReader = null;
         try {
@@ -111,7 +111,7 @@ public class LicensingList extends ArrayList<LicensingObject> {
         }
     }
 
-    public String getRepoLicensesForModule(String moduleName, String version) throws IOException{
+    public String getRepoLicensesForModule(String moduleName, String version) throws IOException, NoLicenseTemplateSetException {
         String result ="3rd party license information for \""+moduleName+"\"\n";
         HashMap<String, HashSet<String>> licenseList = new HashMap<>();
         for(LicensingObject licensingObject: this){
@@ -122,28 +122,30 @@ public class LicensingList extends ArrayList<LicensingObject> {
                 String versionString = licensingObject.get(moduleName).toUpperCase();
                 if(versionString.equals(version.toUpperCase()) || versionString.equals(forceAddingLibraryKeyword.toUpperCase())) {
                     HashSet<String> licenseElement;
-                    String licenseKey = licensingObject.get(LicensingObject.ColumnHeader.LICENSE_TEMPLATE.value());
-                    if (!licenseList.containsKey(licenseKey)) {
+                    String licenseTemplate = licensingObject.get(LicensingObject.ColumnHeader.LICENSE_TEMPLATE.value());
+                    if(licenseTemplate==null)
+                        throw new NoLicenseTemplateSetException(licensingObject);
+                    if (!licenseList.containsKey(licenseTemplate)) {
                         licenseElement = new HashSet<>();
                     } else {
-                        licenseElement = licenseList.get(licenseKey);
+                        licenseElement = licenseList.get(licenseTemplate);
                     }
 
                     //if(!libStrings.contains(libString)) {
                     licenseElement.add(licensingObject.getStringForModule(moduleName, aggregateByBundle));
                     //  libStrings.add(libString);
                     //}
-                    licenseList.put(licenseKey, licenseElement);
+
+                    licenseList.put(licenseTemplate, licenseElement);
                 }
             }
         }
         ArrayList<String> sortedLicenseNames = new ArrayList<>(licenseList.keySet());
-        sortedLicenseNames.remove(null);
+        //sortedLicenseNames.remove(null);
         Collections.sort(sortedLicenseNames);
         for(String key: sortedLicenseNames){
-            InputStream inputStream = null;
             String fn = "/"+licenseTextDirectory + key;
-            inputStream = getClass().getResourceAsStream(fn);
+            InputStream inputStream = getClass().getResourceAsStream(fn);
             if(inputStream!=null){
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
                 String line = null;
@@ -156,9 +158,6 @@ public class LicensingList extends ArrayList<LicensingObject> {
                         for(String libraryInfo: sortedLibraryInfos){
                             result += "\t- "+ libraryInfo+"\n";
                         }
-                        result += "\n-----------------------------------------------------------------------------\n";
-                    }else{
-                        result += line+"\n";
                     }
                 }
                 bufferedReader.close();

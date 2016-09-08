@@ -38,8 +38,8 @@ public class LicensingObject extends HashMap<String, String> {
         BUNDLE("bundle"),
         LICENSE_TEMPLATE("licenseTemplate"),
         LICENSE_NAMES("licenseNames"),
-        LICENSE_URL("licenseUrl"),
-        LICENSE_COMMENT("licenseComment"),
+        LICENSE_URLS("licenseUrls"),
+        LICENSE_COMMENTS("licenseComments"),
         COPYRIGHT_INFORMATION("copyRightInformation"),
         LIBRARY_NAME("libraryName");
 
@@ -66,7 +66,7 @@ public class LicensingObject extends HashMap<String, String> {
     }
 
     static final char textMarker = '"';
-    static final char licenseSeparator = '|';
+    static final char multiEntriesSeparator = '|';
     private final static Set<String> MARKED_AS_TEXT = Collections.unmodifiableSet(
             new HashSet<>(Arrays.asList(ColumnHeader.VERSION.value())));
 
@@ -90,9 +90,9 @@ public class LicensingObject extends HashMap<String, String> {
                     // remove protocol and lookup license url
                     licenseFN = Utils.getValue(licenseUrlFileMappings, license.getUrl().replaceFirst("^[^:]+://", ""));
                 if (i++ > 0) {
-                    licenseNames += licenseSeparator;
-                    licenseUrls += licenseSeparator;
-                    licenseComments += licenseSeparator;
+                    licenseNames += multiEntriesSeparator;
+                    licenseUrls += multiEntriesSeparator;
+                    licenseComments += multiEntriesSeparator;
                 }
                 licenseNames += license.getName();
                 if (!Strings.isNullOrEmpty(license.getUrl()))
@@ -105,9 +105,9 @@ public class LicensingObject extends HashMap<String, String> {
             if(!Strings.isNullOrEmpty(licenseNames))
                 put(ColumnHeader.LICENSE_NAMES.value(), licenseNames);
             if(!Strings.isNullOrEmpty(licenseUrls))
-                put(ColumnHeader.LICENSE_URL.value(), licenseUrls);
+                put(ColumnHeader.LICENSE_URLS.value(), licenseUrls);
             if(!Strings.isNullOrEmpty(licenseComments))
-                put(ColumnHeader.LICENSE_COMMENT.value(), licenseComments);
+                put(ColumnHeader.LICENSE_COMMENTS.value(), licenseComments);
         }
         put(includingProject, version);
         //clean();
@@ -149,7 +149,7 @@ public class LicensingObject extends HashMap<String, String> {
         //check key header values
         for(String keyHeader: keyHeaders){
             if(Strings.isNullOrEmpty(get(keyHeader)))
-                throw new IncompleteLicenseObjectException("Missing value: "+keyHeader);
+                throw new IncompleteLicenseObjectException("Missing value: \""+keyHeader+"\" in \""+this+"\"");
         }
     }
 
@@ -190,6 +190,8 @@ public class LicensingObject extends HashMap<String, String> {
                 libString += " - ";
 
             if(libString.trim().equals("") || !aggregateByBundle){
+                libString += get(ColumnHeader.GROUP_ID.value());
+                libString += ":";
                 libString += get(ColumnHeader.ARTIFACT_ID.value());
                 String version = get(ColumnHeader.VERSION.value());
                 if(version!=null){
@@ -250,7 +252,7 @@ public class LicensingObject extends HashMap<String, String> {
 
             // replace empty license related values like "||" with null
             // and update, if possible
-            put(key, updateElement(thisValue == null || thisValue.matches("\\"+licenseSeparator+"+")?null:thisValue, thatValue == null || thatValue.matches("\\"+licenseSeparator+"+")?null:thatValue, !ColumnHeader.headerValues().contains(key)));
+            put(key, updateElement(thisValue == null || thisValue.matches("\\"+ multiEntriesSeparator +"+")?null:thisValue, thatValue == null || thatValue.matches("\\"+ multiEntriesSeparator +"+")?null:thatValue, !ColumnHeader.headerValues().contains(key)));
         }
     }
 
@@ -273,5 +275,10 @@ public class LicensingObject extends HashMap<String, String> {
             if (get(key) == null || get(key).equals(""))
                 remove(key);
         }
+    }
+
+    @Override
+    public String toString() {
+        return get(ColumnHeader.GROUP_ID.value())+":"+get(ColumnHeader.ARTIFACT_ID.value())+":"+get(ColumnHeader.VERSION.value());
     }
 }
