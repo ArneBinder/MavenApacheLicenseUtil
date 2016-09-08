@@ -69,7 +69,7 @@ public class LicensingObject extends HashMap<String, String> {
             new HashSet<>(Arrays.asList(ColumnHeader.VERSION.value())));
 
     final Logger logger = LoggerFactory.getLogger(LicensingObject.class);
-    static final HashSet<String> keyHeaders = new HashSet<>(Arrays.asList(ColumnHeader.ARTIFACT_ID.value(), ColumnHeader.GROUP_ID.value(), ColumnHeader.VERSION.value(), ColumnHeader.LICENSE_URL.value()));
+    static final HashSet<String> keyHeaders = new HashSet<>(Arrays.asList(ColumnHeader.ARTIFACT_ID.value(), ColumnHeader.GROUP_ID.value(), ColumnHeader.VERSION.value()));
 
     LicensingObject(MavenProject project, String includingProject, String version, Map<String, String> licenseUrlFileMappings) {
         super();

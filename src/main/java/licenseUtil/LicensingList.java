@@ -293,7 +293,7 @@ public class LicensingList extends ArrayList<LicensingObject> {
 
     @Override
     public boolean add(LicensingObject newLicensingObject) {
-         int index = indexOf(newLicensingObject);
+        int index = indexOf(newLicensingObject);
         if (index == -1) {
             return super.add(newLicensingObject);
         } else {
@@ -301,16 +301,11 @@ public class LicensingList extends ArrayList<LicensingObject> {
             int newIndex = indexOf(newLicensingObject);
             int newIndex2 = indexOf(inList);
             if (newIndex != -1) {
-                // or throw exception?
-                logger.warn("could not add newLicensingObject:\t" + newLicensingObject.toString());
-                super.add(inList);
-                logger.debug("current List:\t" + toString());
-                return false;
+                throw new RuntimeException("Deleted licensingObject '"+newLicensingObject.toString() + "', but it is still in the list.");
             } else {
                 inList.update(newLicensingObject);
                 return super.add(inList);
             }
-
         }
     }
 }

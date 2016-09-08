@@ -105,6 +105,7 @@ public class LicenseUtil {
             String spreadSheetFN = args[2];
             String currentVersion = args[3];
             LicensingList licensingList = new LicensingList();
+            licensingList.readFromSpreadsheet(spreadSheetFN, currentVersion);
             licensingList.addAll(processProjectsInFolder(directory, currentVersion, false));
             licensingList.writeToSpreadsheet(spreadSheetFN);
 
@@ -173,26 +174,27 @@ public class LicenseUtil {
             Utils.updateRepository(directory.getPath());
         }
 
-        logger.info("build effective-pom");
-        File pom = new File(directory.getPath()+File.separator+EFFECTIVE_POM_FN);
-        Utils.writeEffectivePom(new File(directory.getPath()), pom.getAbsolutePath());
-        MavenProject project = null;
-        try {
-            project = Utils.readPom(pom);
-        } catch (Exception e) {
-            logger.warn("Could not read from pom file: \"" + pom.getPath() + "\" because of "+e.getMessage());
-            return result;
+        if(pomFile.exists()) {
+            logger.info("build effective-pom");
+            File pom = new File(directory.getPath() + File.separator + EFFECTIVE_POM_FN);
+            Utils.writeEffectivePom(new File(directory.getPath()), pom.getAbsolutePath());
+            MavenProject project = null;
+            try {
+                project = Utils.readPom(pom);
+            } catch (Exception e) {
+                logger.warn("Could not read from pom file: \"" + pom.getPath() + "\" because of " + e.getMessage());
+                return result;
+            }
+            FileUtils.delete(pom);
+
+            // death first
+            for (String module : project.getModules()) {
+                File subdirectory = new File(directory + File.separator + module);
+                result.addAll(processProjectsInFolder(subdirectory, currentVersion, true));
+            }
+
+            result.addMavenProject(project, currentVersion);
         }
-        FileUtils.delete(pom);
-
-        // death first
-        for (String module : project.getModules()) {
-            File subdirectory = new File(directory + File.separator + module);
-            result.addAll(processProjectsInFolder(subdirectory, currentVersion, true));
-        }
-
-        result.addMavenProject(project, currentVersion);
-
         return result;
     }
 
