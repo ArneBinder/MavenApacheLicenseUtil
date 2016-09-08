@@ -32,11 +32,9 @@ which are direct subfolders of `<superDirectory>`, by executing:
 	- `maven-apache-license-util --writeLicense3rdParty <licenses.enhanced.tsv> ALL <currentReleaseVersion> [<targetDir>]` 
 	
 	This will take only the libraries which have the `<currentReleaseVersion>` (or `KEEP`) at the project columns.
-	In addition you can use the optional parameter <targetDir>. IF you do so, all direct subfolders of the <targetDir> 
+	In addition you can use the optional parameter `<targetDir>`. IF you do so, all direct subfolders of the <targetDir> 
 	folder are considered as maven projects and if a project with the same artifactID as in the tsv column headers (projects) 
 	is found, the LICENSE-3RD-PARTY file is written into the containing folder. 
-	Furthermore, the local repo is updated and the changes in the LICENSE-3RD-PARTY file are committed 
-	and pushed for these files, if no special access rights are needed.
 
 ##Usage
 
