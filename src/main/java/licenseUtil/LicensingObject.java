@@ -71,7 +71,7 @@ public class LicensingObject extends HashMap<String, String> {
             new HashSet<>(Arrays.asList(ColumnHeader.VERSION.value())));
 
     final Logger logger = LoggerFactory.getLogger(LicensingObject.class);
-    static final HashSet<String> KEY_HEADERS = new HashSet<>(Arrays.asList(ColumnHeader.ARTIFACT_ID.value(), ColumnHeader.GROUP_ID.value(), ColumnHeader.VERSION.value()));
+    static final HashSet<String> KEY_HEADERS = new HashSet<>(Arrays.asList(ColumnHeader.ARTIFACT_ID.value(), ColumnHeader.GROUP_ID.value()/*, ColumnHeader.VERSION.value()*/));
 
     LicensingObject(MavenProject project, String includingProject, String version, Map<String, String> licenseUrlFileMappings) {
         super();
@@ -254,7 +254,7 @@ public class LicensingObject extends HashMap<String, String> {
 
             // replace empty multi entry values like "||" with null
             // and update, if possible
-            put(key, updateElement(thisValue == null || thisValue.matches("\\"+ multiEntriesSeparator +"+")?null:thisValue, thatValue == null || thatValue.matches("\\"+ multiEntriesSeparator +"+")?null:thatValue, !ColumnHeader.headerValues().contains(key)));
+            put(key, updateElement(thisValue == null || thisValue.matches("\\"+ multiEntriesSeparator +"+")?null:thisValue, thatValue == null || thatValue.matches("\\"+ multiEntriesSeparator +"+")?null:thatValue, (!ColumnHeader.headerValues().contains(key)) || key.equals(ColumnHeader.VERSION.value())));
         }
     }
 
