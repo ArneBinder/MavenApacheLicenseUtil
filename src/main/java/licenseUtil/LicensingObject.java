@@ -122,7 +122,7 @@ public class LicensingObject extends HashMap<String, String> {
         //clean();
     }
 
-    LicensingObject(CSVRecord record) {
+    LicensingObject(CSVRecord record) throws IncompleteLicenseObjectException {
         super();
         Map<String, String> recordMap = record.toMap();
         for (String key : recordMap.keySet()) {
@@ -135,6 +135,12 @@ public class LicensingObject extends HashMap<String, String> {
                 } else
                     put(key, current);
             }
+        }
+
+        //check key header values
+        for(String keyHeader: keyHeaders){
+            if(Strings.isNullOrEmpty(get(keyHeader)))
+                throw new IncompleteLicenseObjectException("Missing value: "+keyHeader);
         }
     }
 

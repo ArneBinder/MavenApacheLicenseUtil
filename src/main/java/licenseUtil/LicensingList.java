@@ -52,7 +52,7 @@ public class LicensingList extends ArrayList<LicensingObject> {
 
     private static Map<String, String> licenseUrlMappings = constructLicenseUrlFileMapping();
 
-    public void readFromSpreadsheet(String spreadsheetFN, String currentVersion) throws IOException {
+    public void readFromSpreadsheet(String spreadsheetFN, String currentVersion) throws IOException, IncompleteLicenseObjectException {
         logger.info("read spreadsheet from \"" + spreadsheetFN + "\"");
         InputStreamReader inputStreamReader = null;
         try {

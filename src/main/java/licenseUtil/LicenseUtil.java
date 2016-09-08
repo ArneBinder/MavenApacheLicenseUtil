@@ -38,7 +38,7 @@ public class LicenseUtil {
     static final String POM_FN = "pom.xml";
     static final String README_PATH = "README.md";
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, IncompleteLicenseObjectException {
         if(args.length==0){
             logger.error("Missing parameters. Use --help to get a list of the possible options.");
         }else if(args[0].equals("--addPomToTsv")){
