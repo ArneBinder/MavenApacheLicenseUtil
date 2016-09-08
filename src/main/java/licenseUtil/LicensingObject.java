@@ -227,17 +227,10 @@ public class LicensingObject extends HashMap<String, String> {
         if (!(aThat instanceof LicensingObject)) return false;
         LicensingObject that = (LicensingObject) aThat;
         boolean result = false;
-        /*if((this.get(ColumnHeader.ARTIFACT_ID.value()) != null) && (this.get(ColumnHeader.ARTIFACT_ID.value()).equals("common"))
-                //&&(this.get(ColumnHeader.GROUP_ID.value()) == null) && (this.get(ColumnHeader.GROUP_ID.value()).equals("eu.freme"))
-                //&&(that.get(ColumnHeader.ARTIFACT_ID.value()) != null) && (that.get(ColumnHeader.ARTIFACT_ID.value()).equals("common"))
-                &&(that.get(ColumnHeader.GROUP_ID.value()) != null) && (that.get(ColumnHeader.GROUP_ID.value()).equals("eu.freme"))
-                ){
-            System.out.println();
-        }*/
 
-        result = ((/*this.get(ColumnHeader.ARTIFACT_ID.value()) == null || that.get(ColumnHeader.ARTIFACT_ID.value()) == null || */this.get(ColumnHeader.ARTIFACT_ID.value()).equals(that.get(ColumnHeader.ARTIFACT_ID.value()))) &&
-                (/*this.get(ColumnHeader.GROUP_ID.value()) == null || that.get(ColumnHeader.GROUP_ID.value()) == null || */this.get(ColumnHeader.GROUP_ID.value()).equals(that.get(ColumnHeader.GROUP_ID.value()))) &&
-                (/*this.get(ColumnHeader.VERSION.value()) == null || that.get(ColumnHeader.VERSION.value()) == null || */this.get(ColumnHeader.VERSION.value()).equals(that.get(ColumnHeader.VERSION.value()))));
+        result = ((this.get(ColumnHeader.ARTIFACT_ID.value()).equals(that.get(ColumnHeader.ARTIFACT_ID.value()))) &&
+                (this.get(ColumnHeader.GROUP_ID.value()).equals(that.get(ColumnHeader.GROUP_ID.value()))) &&
+                (this.get(ColumnHeader.VERSION.value()).equals(that.get(ColumnHeader.VERSION.value()))));
         return result;
     }
 
