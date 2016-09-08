@@ -167,7 +167,7 @@ public class Utils {
 
         ArtifactResult artifactResult = system.resolveArtifact( session, artifactRequest );
         artifact = artifactResult.getArtifact();
-        logger.debug( artifact + " resolved to  " + artifact.getFile() );
+        logger.info( "resolved artifact \""+ artifact + "\" to \"" + artifact.getFile() + "\"" );
 
         return Utils.readPom(artifact.getFile());
     }
