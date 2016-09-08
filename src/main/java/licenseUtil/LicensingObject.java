@@ -71,7 +71,7 @@ public class LicensingObject extends HashMap<String, String> {
             new HashSet<>(Arrays.asList(ColumnHeader.VERSION.value())));
 
     final Logger logger = LoggerFactory.getLogger(LicensingObject.class);
-    static final HashSet<String> keyHeaders = new HashSet<>(Arrays.asList(ColumnHeader.ARTIFACT_ID.value(), ColumnHeader.GROUP_ID.value(), ColumnHeader.VERSION.value()));
+    static final HashSet<String> KEY_HEADERS = new HashSet<>(Arrays.asList(ColumnHeader.ARTIFACT_ID.value(), ColumnHeader.GROUP_ID.value(), ColumnHeader.VERSION.value()));
 
     LicensingObject(MavenProject project, String includingProject, String version, Map<String, String> licenseUrlFileMappings) {
         super();
@@ -147,7 +147,7 @@ public class LicensingObject extends HashMap<String, String> {
         }
 
         //check key header values
-        for(String keyHeader: keyHeaders){
+        for(String keyHeader: KEY_HEADERS){
             if(Strings.isNullOrEmpty(get(keyHeader)))
                 throw new IncompleteLicenseObjectException("Missing value: \""+keyHeader+"\" in \""+this+"\"");
         }
@@ -231,18 +231,20 @@ public class LicensingObject extends HashMap<String, String> {
         if (this == aThat) return true;
         if (!(aThat instanceof LicensingObject)) return false;
         LicensingObject that = (LicensingObject) aThat;
-        boolean result = false;
 
-        result = ((this.get(ColumnHeader.ARTIFACT_ID.value()).equals(that.get(ColumnHeader.ARTIFACT_ID.value()))) &&
-                (this.get(ColumnHeader.GROUP_ID.value()).equals(that.get(ColumnHeader.GROUP_ID.value()))) &&
-                (this.get(ColumnHeader.VERSION.value()).equals(that.get(ColumnHeader.VERSION.value()))));
-        return result;
+        for(String keyHeader: KEY_HEADERS){
+            if(this.get(keyHeader)==null || that.get(keyHeader)==null || !this.get(keyHeader).equals(that.get(keyHeader)))
+                return false;
+        }
+        return true;
     }
 
     public int hashCode() {
-        return get(ColumnHeader.ARTIFACT_ID.value()).hashCode() *
-                get(ColumnHeader.GROUP_ID.value()).hashCode() *
-                get(ColumnHeader.VERSION.value()).hashCode();
+        int result = 1;
+        for(String keyHeader: KEY_HEADERS) {
+            result *= get(keyHeader).hashCode();
+        }
+        return result;
     }
 
     public void update(LicensingObject licensingObject) {
@@ -250,7 +252,7 @@ public class LicensingObject extends HashMap<String, String> {
             String thisValue = get(key);
             String thatValue = licensingObject.get(key);
 
-            // replace empty license related values like "||" with null
+            // replace empty multi entry values like "||" with null
             // and update, if possible
             put(key, updateElement(thisValue == null || thisValue.matches("\\"+ multiEntriesSeparator +"+")?null:thisValue, thatValue == null || thatValue.matches("\\"+ multiEntriesSeparator +"+")?null:thatValue, !ColumnHeader.headerValues().contains(key)));
         }
