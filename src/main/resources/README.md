@@ -9,22 +9,34 @@ and helps you to create LICENSE-3RD-PARTY files.
 
 ##The workflow is as follows:
 
-1. Update local repositories, build effective-poms and add pom content to `<license.stub.tsv>` for all projects, 
+1. Update local repositories, build effective-poms and add pom content (used dependencies, plugins) to `<license.stub.tsv>` for all projects, 
 which are direct subfolders of `<superDirectory>`, by executing:
 	- `maven-apache-license-util --updateTsvWithProjectsInFolder <superDirectory> <license.stub.tsv> <currentReleaseVersion>`
 	
 	`<currentReleaseVersion>` should be a value, which marks your current release.
+	
+	**Automatic fetching of license information**: The *Maven Apache License Util* tries to fetch license information 
+	for all dependency and plugin artifacts. Therefore, it requests the pom files of these artifacts using the repository 
+	information of the main project `pom.xml` and extracts the information from the 
+	[licenses object](https://maven.apache.org/pom.html#Licenses), if present. Furthermore, it tries to link 
+	a license template (see step 2) via the license urls in the [licenses object](https://maven.apache.org/pom.html#Licenses). To
+	achieve this, the headers (everything before the `#libraryListPLaceholder`) of the license templates are scanned for 
+	matching urls and linked to the containing license template. If multiple licenses are mentioned in the 
+	[licenses object](https://maven.apache.org/pom.html#Licenses), the first matching license template will taken.
+	The found license names, urls comments and the file name of the license template are written into the columns 
+	`licenseNames`, `licenseUrls`, `licenseComments` and `licenseTemplate` of the `<license.stub.tsv>`.
+	
 	If you have an `<licenses.enhanced.tsv>` from an earlier release, use this as `<license.stub.tsv>`. 
 	The former license information will be kept, just the old `<currentReleaseVersion>` value will be overwritten, 
 	if the library is still in use for the current release.
 
-	NOTE: This will overwrite the old `<licenses.enhanced.tsv>`. 
+	**NOTE**: This will overwrite the old `<licenses.enhanced.tsv>`. 
 2. Enhance the licenses.stub.tsv by yourself:
-   	- Especially fill the "licenseTemplate" column according to the filenames of the license templates in resources/templates 
+   	- Especially fill the `licenseTemplate` column according to the filenames of the license templates in resources/templates 
    		(APACHE2, BSD, BSD3, CDDL, EPLV1, GPLV2, GPLV3, H2, JSON, LGPLV3, MIT, MPL2, SLICKBSD, UNLICENSE).
    	- Furthermore, fill the column "bundle" and "libraryName" for better readability and "copyRightInformation", 
    		if this information is available.
-   	- Add projects which does not use maven manually, if needed. Write "KEEP" at the position of the libraries 
+   	- Add projects which does not use maven manually, if needed. Write `KEEP` at the position of the libraries 
    		of these models (instead of `<currentReleaseVersion>` in the auto generated columns) to avoid 
    		the need of updating these fields manually, when you want to release the next time.
   
@@ -34,7 +46,7 @@ which are direct subfolders of `<superDirectory>`, by executing:
 	This will take only the libraries which have the `<currentReleaseVersion>` (or `KEEP`) at the project columns.
 	In addition you can use the optional parameter `<targetDir>`. IF you do so, all direct subfolders of the `<targetDir>` 
 	folder are considered as maven projects and if a project with the same artifactID as in the tsv column headers (projects) 
-	is found, the LICENSE-3RD-PARTY file is written into the containing folder. 
+	is found, the `LICENSE-3RD-PARTY` file is written into the containing folder. 
 
 ##Usage
 
