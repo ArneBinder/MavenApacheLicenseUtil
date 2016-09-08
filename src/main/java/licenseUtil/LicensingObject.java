@@ -38,6 +38,7 @@ public class LicensingObject extends HashMap<String, String> {
         BUNDLE("bundle"),
         LICENSE("license"),
         LICENSE_URL("licenseUrl"),
+        LICENSE_COMMENT("licenseComment"),
         COPYRIGHT_INFORMATION("copyRightInformation"),
         LIBRARY_NAME("libraryName");
 
@@ -80,6 +81,7 @@ public class LicensingObject extends HashMap<String, String> {
         if(project.getLicenses()!=null && !project.getLicenses().isEmpty()){
             String licenseNames = "";
             String licenseUrls = "";
+            String licenseComments = "";
             String licenseFN = null;
             int i = 0;
             for(License license:project.getLicenses()) {
@@ -88,10 +90,13 @@ public class LicensingObject extends HashMap<String, String> {
                 if (i++ > 0) {
                     licenseNames += licenseSeparator;
                     licenseUrls += licenseSeparator;
+                    licenseComments += licenseSeparator;
                 }
                 licenseNames += license.getName();
                 if (!Strings.isNullOrEmpty(license.getUrl()))
                     licenseUrls += license.getUrl();
+                if (!Strings.isNullOrEmpty(license.getComments()))
+                    licenseComments += license.getComments();
             }
             if(licenseFN != null){
                 put(ColumnHeader.LICENSE.value(), licenseFN);
@@ -99,6 +104,7 @@ public class LicensingObject extends HashMap<String, String> {
                 put(ColumnHeader.LICENSE.value(), licenseNames);
             }
             put(ColumnHeader.LICENSE_URL.value(), licenseUrls);
+            put(ColumnHeader.LICENSE_COMMENT.value(), licenseComments);
         }
         put(includingProject, version);
         //clean();
@@ -242,14 +248,13 @@ public class LicensingObject extends HashMap<String, String> {
     }
 
     public void update(LicensingObject licensingObject) {
-        for (String key : keySet()) {
-            put(key, updateElement(get(key), licensingObject.get(key), !keyHeaders.contains(key)));
-            get(key);
-        }
         for (String key : licensingObject.keySet()) {
-            if (!keySet().contains(key)) {
-                put(key, licensingObject.get(key));
-            }
+            String thisValue = get(key);
+            String thatValue = licensingObject.get(key);
+
+            // replace empty license related values like "||" with null
+            // and update, if possible
+            put(key, updateElement(thisValue == null || thisValue.matches("\\"+licenseSeparator+"+")?null:thisValue, thatValue == null || thatValue.matches("\\"+licenseSeparator+"+")?null:thatValue, !ColumnHeader.headerValues().contains(key)));
         }
     }
 
