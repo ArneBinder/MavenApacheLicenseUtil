@@ -87,7 +87,7 @@ public class LicensingList extends ArrayList<LicensingObject> {
             csvFilePrinter = new CSVPrinter(fileWriter, csvFileFormat);
 
             ArrayList<String> headers = new ArrayList<>();
-            headers.addAll(LicensingObject.ColumnHeader.headerValues());
+            headers.addAll(LicensingObject.ColumnHeader.HEADER_VALUES);
             headers.addAll(getNonFixedHeaders());
             //Create CSV file header
             csvFilePrinter.printRecord(headers);
@@ -298,7 +298,7 @@ public class LicensingList extends ArrayList<LicensingObject> {
         } else {
             LicensingObject inList = remove(index);
             int newIndex = indexOf(newLicensingObject);
-            int newIndex2 = indexOf(inList);
+            //int newIndex2 = indexOf(inList);
             if (newIndex != -1) {
                 throw new RuntimeException("Deleted licensingObject '"+newLicensingObject.toString() + "', but it is still in the list.");
             } else {

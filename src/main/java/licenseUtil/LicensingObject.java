@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by Arne Binder (arne.b.binder@gmail.com) on 10.09.2015.
@@ -52,13 +53,9 @@ public class LicensingObject extends HashMap<String, String> {
         public String value() {
             return this.headerValue;
         }
-        public static ArrayList<String> headerValues(){
-            ArrayList<String> result = new ArrayList<>();
-            for(ColumnHeader header: ColumnHeader.class.getEnumConstants()){
-                result.add(header.value());
-            }
-            return result;
-        }
+
+        public static final Set<String> HEADER_VALUES = Arrays.stream(ColumnHeader.class.getEnumConstants()).map(ColumnHeader::value).collect(Collectors.toSet());
+
         @Override
         public String toString(){
             return this.headerValue;
@@ -71,7 +68,7 @@ public class LicensingObject extends HashMap<String, String> {
             new HashSet<>(Arrays.asList(ColumnHeader.VERSION.value())));
 
     final Logger logger = LoggerFactory.getLogger(LicensingObject.class);
-    static final HashSet<String> KEY_HEADERS = new HashSet<>(Arrays.asList(ColumnHeader.ARTIFACT_ID.value(), ColumnHeader.GROUP_ID.value()/*, ColumnHeader.VERSION.value()*/));
+    static final HashSet<String> KEY_HEADERS = new HashSet<>(Arrays.asList(ColumnHeader.ARTIFACT_ID.value(), ColumnHeader.GROUP_ID.value(), ColumnHeader.VERSION.value()));
 
     LicensingObject(MavenProject project, String includingProject, String version, Map<String, String> licenseUrlFileMappings) {
         super();
@@ -254,14 +251,14 @@ public class LicensingObject extends HashMap<String, String> {
 
             // replace empty multi entry values like "||" with null
             // and update, if possible
-            put(key, updateElement(thisValue == null || thisValue.matches("\\"+ multiEntriesSeparator +"+")?null:thisValue, thatValue == null || thatValue.matches("\\"+ multiEntriesSeparator +"+")?null:thatValue, (!ColumnHeader.headerValues().contains(key)) || key.equals(ColumnHeader.VERSION.value())));
+            put(key, updateElement(thisValue == null || thisValue.matches("\\"+ multiEntriesSeparator +"*")?null:thisValue, thatValue == null || thatValue.matches("\\"+ multiEntriesSeparator +"*")?null:thatValue, !KEY_HEADERS.contains(key)));
         }
     }
 
     public HashSet<String> getNonFixedHeaders() {
         HashSet<String> result = new HashSet<>();
         result.addAll(keySet());
-        result.removeAll(new HashSet<>(ColumnHeader.headerValues()));
+        result.removeAll(ColumnHeader.HEADER_VALUES);
         return result;
     }
 
