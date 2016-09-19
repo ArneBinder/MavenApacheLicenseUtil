@@ -158,6 +158,8 @@ public class LicensingList extends ArrayList<LicensingObject> {
                         for(String libraryInfo: sortedLibraryInfos){
                             result += "\t- "+ libraryInfo+"\n";
                         }
+                    }else{
+                        result += line+"\n";
                     }
                 }
                 bufferedReader.close();
