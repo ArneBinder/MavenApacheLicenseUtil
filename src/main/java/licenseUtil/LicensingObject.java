@@ -33,15 +33,15 @@ import java.util.stream.Collectors;
 public class LicensingObject extends HashMap<String, String> {
 
     public enum ColumnHeader {
-        ARTIFACT_ID("artifactId"),
         GROUP_ID("groupId"),
+        ARTIFACT_ID("artifactId"),
         VERSION("version"),
-        BUNDLE("bundle"),
         LICENSE_TEMPLATE("licenseTemplate"),
         LICENSE_NAMES("licenseNames"),
         LICENSE_URLS("licenseUrls"),
         LICENSE_COMMENTS("licenseComments"),
         COPYRIGHT_INFORMATION("copyRightInformation"),
+        BUNDLE("bundle"),
         LIBRARY_NAME("libraryName");
 
         private final String headerValue;
@@ -54,7 +54,7 @@ public class LicensingObject extends HashMap<String, String> {
             return this.headerValue;
         }
 
-        public static final Set<String> HEADER_VALUES = Arrays.stream(ColumnHeader.class.getEnumConstants()).map(ColumnHeader::value).collect(Collectors.toSet());
+        public static final List<String> HEADER_VALUES = Arrays.stream(ColumnHeader.class.getEnumConstants()).map(ColumnHeader::value).collect(Collectors.toList());
 
         @Override
         public String toString(){
